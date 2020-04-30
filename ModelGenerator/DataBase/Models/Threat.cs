@@ -15,14 +15,14 @@ namespace ModelGenerator.DataBase.Models
 
         public string Description { get; set; }
 
-        public bool IsHasPrivacyViolation { get; }
+        public bool IsHasPrivacyViolation { get; set; }
 
-        public bool IsHasIntegrityViolation { get; }
+        public bool IsHasIntegrityViolation { get; set; }
 
-        public bool IsHasAvailabilityViolation { get; }
+        public bool IsHasAvailabilityViolation { get; set; }
 
-        public List<ThreatSource> ThreatSource { get; }
+        public List<ThreatSource> ThreatSource { get; set; } = new List<ThreatSource>();
 
-        public List<ThreatTarget> ThreatTarget { get; }
+        public List<ThreatTarget> ThreatTarget { get; set; } = new List<ThreatTarget>();
     }
 }

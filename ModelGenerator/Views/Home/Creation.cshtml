@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+    <div class="text-center">
+        @using (Html.BeginForm("CreateUser", "Home", FormMethod.Post))
+        {
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-lg-4" style="padding-left: 0 !important">
+                    <label>Имя</label>
+                    <input name="Name" placeholder="Введите имя" class="form-control" value="@ViewBag.key" />
+                </div>
+            </div>
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-lg-4" style="padding-left: 0 !important">
+                    <label>Логин</label>
+                    <input name="Login" placeholder="Введите логин" class="form-control" value="@ViewBag.key" />
+                </div>
+            </div>
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-lg-4" style="padding-left: 0 !important">
+                    <label>Пароль</label>
+                    <input name="Password" placeholder="Введите пароль" class="form-control" value="@ViewBag.key"/>
+                </div>
+            </div>
+            <div class="col-lg-2 text-right " style="padding-right: 0 !important">
+                <input type="submit" class="btn  btn-secondary" value="Создаь" name="action"/>
+            </div>
+        }
+    </div>

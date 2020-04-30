@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ModelGenerator.DataBase;
 
 namespace ModelGenerator
 {
@@ -22,5 +23,6 @@ namespace ModelGenerator
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+        
     }
 }

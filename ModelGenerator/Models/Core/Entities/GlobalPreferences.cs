@@ -5,9 +5,9 @@ namespace ThreatsParser.Entities
 {
     public class GlobalPreferences
     {
-        public List<Threat> Items { get; set; }
+        public List<ThreatModel> Items { get; set; }
 
-        public List<Threat> AllItems { get; set; }
+        public List<ThreatModel> AllItems { get; set; }
 
         public List<(string, bool)> Source { get; set; }
 
@@ -21,8 +21,8 @@ namespace ThreatsParser.Entities
 
         public GlobalPreferences()
         {
-            Items = new List<Threat>();
-            AllItems = new List<Threat>();
+            Items = new List<ThreatModel>();
+            AllItems = new List<ThreatModel>();
             Source = new List<(string, bool)>();
             Targets = new List<(string, bool)>();
             Dangers = new List<DangerousLevelLine>();

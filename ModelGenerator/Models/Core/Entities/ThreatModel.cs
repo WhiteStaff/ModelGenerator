@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ModelGenerator.DataBase.Models;
 using ModelGenerator.DataBase.Models.Enums;
 using TreatsParser.Core.Helpers;
 
 namespace ThreatsParser.Entities
 {
-    public class Threat
+    public class ThreatModel
     {
         public int Id { get; }
 
@@ -69,7 +71,19 @@ namespace ThreatsParser.Entities
             }
         }
 
-        public Threat(string[] rowValues)
+        public ThreatModel(Threat threat)
+        {
+            Id = threat.ThreatId;
+            Name = threat.Name;
+            Description = threat.Description;
+            Source =threat.ThreatSource.Select(x => x.Source.Name).ToList();
+            ExposureSubject =threat.ThreatTarget.Select(x => x.Target.Name).ToList();
+            IsHasIntegrityViolation = threat.IsHasIntegrityViolation;
+            IsHasAvailabilityViolation = threat.IsHasAvailabilityViolation;
+            IsHasPrivacyViolation = threat.IsHasPrivacyViolation;
+        }
+
+        public ThreatModel(string[] rowValues)
         {
             Id = int.Parse(rowValues[0]);
             Name = rowValues[1].Replace("_x000d_", "\n");
@@ -133,7 +147,7 @@ namespace ThreatsParser.Entities
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Threat threat)) return false;
+            if (!(obj is ThreatModel threat)) return false;
             var x1 = Id == threat.Id;
             var x2 = Name.Replace("\r", "").Replace("\n", "") == threat.Name.Replace("\r", "").Replace("\n", "");
             var x3 = Description.Replace("\r", "").Replace("\n", "") ==

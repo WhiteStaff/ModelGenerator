@@ -12,6 +12,8 @@ namespace ModelGenerator.DataBase.Models
 
         public string Name { get; set; }
 
-        public List<ThreatSource> ThreatSource { get; set; }
+        public List<ThreatSource> ThreatSource { get; set; } = new List<ThreatSource>();
+
+        public List<ModelPreferencesSource> ModelPreferencesSource { get; set; } = new List<ModelPreferencesSource>();
     }
 }

@@ -1,0 +1,26 @@
+﻿@model ModelGenerator.Views.Creation.FirstStepModel
+
+<form method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                @foreach (var source in Model.Preferences.Source)
+                {
+                    <input name="Values" type="checkbox" value="@source.Item1" checked="@source.Item2" />
+                    @source.Item1
+                    <br />
+                }
+            </div>
+            <div class="col-6">
+                @foreach (var source in Model.Preferences.Targets)
+                {
+                    <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2" />
+                    @source.Item1
+                    <br />
+                }
+            </div>
+        </div>
+        <button asp-action="FirstStepHelper" asp-controller="Creation"> Отмена</button>
+        <button asp-action="SecondStep" asp-controller="Creation"> Далее</button>
+    </div>
+</form>

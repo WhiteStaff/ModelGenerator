@@ -10,9 +10,9 @@ namespace ModelGenerator.DataBase.Models
         [Key]
         public Guid Id { get; set; }
 
-        public ICollection<Target> Target { get; set; }
+        public List<ModelPreferencesTarget> ModelPreferencesTarget { get; set; }
 
-        public ICollection<Source> Source { get; set; }
+        public List<ModelPreferencesSource> ModelPreferencesSource { get; set; }
 
         public ICollection<ThreatPossibility> ThreatPossibilities { get; set; }
 

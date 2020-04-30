@@ -2,11 +2,11 @@
 {
     class ThreatsChanges
     {
-        private readonly Threat _was;
-        private readonly Threat _will;
+        private readonly ThreatModel _was;
+        private readonly ThreatModel _will;
         public string[] Was => _was == null ? new [] {"", "", "", "", "", "", "", ""} : _was.GetValuesAsArray();
         public string[] Will => _will == null ? new[] { "", "", "", "", "", "", "", "" } : _will.GetValuesAsArray();
-        public ThreatsChanges(Threat was, Threat will)
+        public ThreatsChanges(ThreatModel was, ThreatModel will)
         {
             _was = was;
             _will = will;

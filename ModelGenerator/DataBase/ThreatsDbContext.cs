@@ -38,6 +38,34 @@ namespace ModelGenerator.DataBase
                 .HasOne(sc => sc.Target)
                 .WithMany(c => c.ThreatTarget)
                 .HasForeignKey(sc => sc.ThreatId);
+
+
+
+            modelBuilder.Entity<ModelPreferencesSource>()
+                .HasKey(t => new { t.SourceId, t.ModelPreferencesId });
+
+            modelBuilder.Entity<ModelPreferencesTarget>()
+                .HasKey(t => new { t.TargetId, t.ModelPreferencesId });
+
+            modelBuilder.Entity<ModelPreferencesSource>()
+                .HasOne(sc => sc.ModelPreferences)
+                .WithMany(s => s.ModelPreferencesSource)
+                .HasForeignKey(sc => sc.SourceId);
+
+            modelBuilder.Entity<ModelPreferencesSource>()
+                .HasOne(sc => sc.Source)
+                .WithMany(c => c.ModelPreferencesSource)
+                .HasForeignKey(sc => sc.ModelPreferencesId);
+
+            modelBuilder.Entity<ModelPreferencesTarget>()
+                .HasOne(sc => sc.ModelPreferences)
+                .WithMany(s => s.ModelPreferencesTarget)
+                .HasForeignKey(sc => sc.TargetId);
+
+            modelBuilder.Entity<ModelPreferencesTarget>()
+                .HasOne(sc => sc.Target)
+                .WithMany(c => c.ModelPreferencesTarget)
+                .HasForeignKey(sc => sc.ModelPreferencesId);
         }
 
         public DbSet<Model> Model { get; set; }

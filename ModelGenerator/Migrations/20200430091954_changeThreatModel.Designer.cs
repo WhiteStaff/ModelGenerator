@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModelGenerator.DataBase;
 
 namespace ModelGenerator.Migrations
 {
     [DbContext(typeof(ThreatsDbContext))]
-    partial class ThreatsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200430091954_changeThreatModel")]
+    partial class changeThreatModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,46 +135,21 @@ namespace ModelGenerator.Migrations
                     b.ToTable("ModelPreferences");
                 });
 
-            modelBuilder.Entity("ModelGenerator.DataBase.Models.ModelPreferencesSource", b =>
-                {
-                    b.Property<Guid>("SourceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ModelPreferencesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SourceId", "ModelPreferencesId");
-
-                    b.HasIndex("ModelPreferencesId");
-
-                    b.ToTable("ModelPreferencesSource");
-                });
-
-            modelBuilder.Entity("ModelGenerator.DataBase.Models.ModelPreferencesTarget", b =>
-                {
-                    b.Property<Guid>("TargetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ModelPreferencesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TargetId", "ModelPreferencesId");
-
-                    b.HasIndex("ModelPreferencesId");
-
-                    b.ToTable("ModelPreferencesTarget");
-                });
-
             modelBuilder.Entity("ModelGenerator.DataBase.Models.Source", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ModelPreferencesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ModelPreferencesId");
 
                     b.ToTable("Source");
                 });
@@ -183,10 +160,15 @@ namespace ModelGenerator.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ModelPreferencesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ModelPreferencesId");
 
                     b.ToTable("Target");
                 });
@@ -364,34 +346,18 @@ namespace ModelGenerator.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModelGenerator.DataBase.Models.ModelPreferencesSource", b =>
+            modelBuilder.Entity("ModelGenerator.DataBase.Models.Source", b =>
                 {
-                    b.HasOne("ModelGenerator.DataBase.Models.Source", "Source")
-                        .WithMany("ModelPreferencesSource")
-                        .HasForeignKey("ModelPreferencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ModelGenerator.DataBase.Models.ModelPreferences", "ModelPreferences")
-                        .WithMany("ModelPreferencesSource")
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ModelGenerator.DataBase.Models.ModelPreferences", null)
+                        .WithMany("Source")
+                        .HasForeignKey("ModelPreferencesId");
                 });
 
-            modelBuilder.Entity("ModelGenerator.DataBase.Models.ModelPreferencesTarget", b =>
+            modelBuilder.Entity("ModelGenerator.DataBase.Models.Target", b =>
                 {
-                    b.HasOne("ModelGenerator.DataBase.Models.Target", "Target")
-                        .WithMany("ModelPreferencesTarget")
-                        .HasForeignKey("ModelPreferencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ModelGenerator.DataBase.Models.ModelPreferences", "ModelPreferences")
-                        .WithMany("ModelPreferencesTarget")
-                        .HasForeignKey("TargetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ModelGenerator.DataBase.Models.ModelPreferences", null)
+                        .WithMany("Target")
+                        .HasForeignKey("ModelPreferencesId");
                 });
 
             modelBuilder.Entity("ModelGenerator.DataBase.Models.ThreatDanger", b =>
