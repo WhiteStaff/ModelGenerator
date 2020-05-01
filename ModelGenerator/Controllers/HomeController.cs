@@ -48,7 +48,7 @@ namespace ModelGenerator.Controllers
         [HttpGet, Route("createDb")]
         public IActionResult CreateTable()
         {
-            FileCreator.SetParsedData(_context);
+            Creator.SetParsedData(_context);
 
             return Ok();
         }

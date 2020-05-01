@@ -31,7 +31,7 @@ namespace ModelGenerator.Controllers
 
         public IActionResult Start()
         {
-            Preferences = FileCreator.Initialize(_context, Guid.Empty);
+            Preferences = Creator.Initialize(_context, Guid.Empty);
             var json = JsonConvert.SerializeObject(Preferences);
             TempData["qw"] = json;
             HttpContext.Session.SetString("pref", json);
@@ -259,13 +259,28 @@ namespace ModelGenerator.Controllers
                 .Select((x, y) => new ModelLine(y + 1, x))
                 .ToList();
             var userId = _context.User.FirstOrDefault(x => x.Login == User.Identity.Name).Id;
-            FileCreator.SaveModel(_context, Preferences, model, userId, Name);
-            return Ok();
+            Creator.SaveModel(_context, Preferences, model, userId, Name);
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult PreviewExist(Guid id)
         {
-            return Ok();
+            Preferences = Creator.Initialize(_context, id);
+            var json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("FirstStep", new FirstStepModel(Preferences));
+        }
+
+        public IActionResult DeleteExist(Guid id)
+        {
+            Creator.DeleteModel(_context, id);
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult DownloadExist(Guid id)
+        {
+            return RedirectToAction("Index", "Home");
         }
 
     }

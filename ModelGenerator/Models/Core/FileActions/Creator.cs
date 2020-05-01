@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using ModelGenerator.DataBase;
@@ -18,7 +19,7 @@ using DbModelLine = ModelGenerator.DataBase.Models.ModelLine;
 
 namespace ThreatsParser.FileActions
 {
-    static class FileCreator
+    static class Creator
     {
         private static GlobalPreferences GetParsedData()
         {
@@ -59,10 +60,10 @@ namespace ThreatsParser.FileActions
                         context.Target.Add(tModel);
                     }
 
-                    var tar2th = new ThreatTarget {Target = tModel, Threat = model };
+                    var tar2th = new ThreatTarget {Target = tModel, Threat = model};
 
                     tModel.ThreatTarget.Add(tar2th);
-                    
+
                     context.SaveChanges();
                 }
 
@@ -79,13 +80,12 @@ namespace ThreatsParser.FileActions
                         context.Source.Add(tModel);
                     }
 
-                    var tar2th = new ThreatSource {Source = tModel, Threat = model };
+                    var tar2th = new ThreatSource {Source = tModel, Threat = model};
 
                     tModel.ThreatSource.Add(tar2th);
-                    
+
                     context.SaveChanges();
                 }
-
             }
 
             context.SaveChanges();
@@ -179,7 +179,7 @@ namespace ThreatsParser.FileActions
         {
             var globalPreferences = new GlobalPreferences();
             globalPreferences.InitialSecurityLevel = new InitialSecurityLevel();
-            globalPreferences.Items = globalPreferences.AllItems =
+            globalPreferences.AllItems =
                 context.Threat
                     .Include(x => x.ThreatSource)
                     .ThenInclude(x => x.Source)
@@ -188,33 +188,23 @@ namespace ThreatsParser.FileActions
                     .ToList()
                     .Select(x => new ThreatModel(x))
                     .ToList();
-
-            var sources = context.Source.Select(x => x.Name).ToList();
-            globalPreferences.Source = modelId == Guid.Empty
-                ? sources
-                    .Select(x => (x, true))
-                    .ToList()
-                : context.Model
-                    .FirstOrDefault(x => x.Id == modelId)
-                    .Preferences.ModelPreferencesSource
-                    .Select(x => x.Source.Name)
-                    .Select(x => (x, sources.Contains(x)))
-                    .ToList();
-
-            var targets = context.Target.Select(x => x.Name).ToList();
-            globalPreferences.Targets = modelId == Guid.Empty
-                ? targets
-                    .Select(x => (x, true))
-                    .ToList()
-                : context.Model
-                    .FirstOrDefault(x => x.Id == modelId)
-                    .Preferences.ModelPreferencesTarget
-                    .Select(x => x.Target.Name)
-                    .Select(x => (x, targets.Contains(x)))
-                    .ToList();
-
             if (modelId == Guid.Empty)
             {
+                globalPreferences.Items = globalPreferences.AllItems;
+
+
+                var sources = context.Source.Select(x => x.Name).ToList();
+                globalPreferences.Source = sources
+                    .Select(x => (x, true))
+                    .ToList();
+
+
+                var targets = context.Target.Select(x => x.Name).ToList();
+                globalPreferences.Targets = targets
+                    .Select(x => (x, true))
+                    .ToList();
+
+
                 globalPreferences.AllItems
                     .ForEach(currentThreat => currentThreat.Source
                         .ForEach(source =>
@@ -231,18 +221,75 @@ namespace ThreatsParser.FileActions
             }
             else
             {
-                globalPreferences.Dangers = globalPreferences.AllDangers =
-                    context.Model.Include(x => x.Preferences.ThreatDangers).FirstOrDefault(x => x.Id == modelId)
-                        .Preferences.ThreatDangers.ToList()
-                        .Select(x => new DangerousLevelLine(x.Source.Name, x.Threat.Name, x.Properties)).ToList();
+                var preferences = context.Model.Include(x => x.Preferences).FirstOrDefault(x => x.Id == modelId).Preferences;
+
+                globalPreferences.InitialSecurityLevel.TerritorialLocation = preferences.LocationCharacteristic;
+                globalPreferences.InitialSecurityLevel.NetworkCharacteristic = preferences.NetworkCharacteristic;
+                globalPreferences.InitialSecurityLevel.PersonalDataActionCharacteristics = preferences.PersonalDataActionCharacteristics;
+                globalPreferences.InitialSecurityLevel.PersonalDataSharingLevel = preferences.PersonalDataSharingLevel;
+                globalPreferences.InitialSecurityLevel.OtherDbConnections = preferences.OtherDBConnections;
+                globalPreferences.InitialSecurityLevel.AnonymityLevel = preferences.AnonymityLevel;
+                globalPreferences.InitialSecurityLevel.PersonalDataPermissionSplit = preferences.PersonalDataPermissionSplit;
+                globalPreferences.InitialSecurityLevel.PrivacyViolationDanger = preferences.PrivacyViolationDanger;
+                globalPreferences.InitialSecurityLevel.IntegrityViolationDanger = preferences.IntegrityViolationDanger;
+                globalPreferences.InitialSecurityLevel.AvailabilityViolationDanger = preferences.AvailabilityViolationDanger;
+
+                var full = context.ModelPreferences
+                    .Include(x => x.ThreatPossibilities).ThenInclude(x => x.Threat)
+                    .Include(x => x.ThreatDangers).ThenInclude(x => x.Source)
+                    .Include(x => x.ModelPreferencesSource)
+                    .FirstOrDefault(x => x.Id == preferences.Id);
+
+                var notFull = context.ModelPreferences
+                    .Include(x => x.ModelPreferencesTarget)
+                    .ThenInclude(x => x.Target)
+                    .FirstOrDefault(x => x.Id == preferences.Id);
+
+                var sources = full.ModelPreferencesSource.Select(x => x.Source.Name);
+                globalPreferences.Source = context.Source.ToList().Select(x => (x.Name, sources.Contains(x.Name))).ToList();
+
+                var targets = notFull.ModelPreferencesTarget.Select(x => x.Target.Name);
+                globalPreferences.Targets =
+                    context.Target.ToList().Select(x => (x.Name, targets.Contains(x.Name))).ToList();
+
+                globalPreferences.AllItems
+                    .ForEach(currentThreat => currentThreat.Source
+                        .ForEach(source =>
+                        {
+                            if (!globalPreferences.Dangers.Any(x =>
+                                x.Equal(currentThreat.Name, source, currentThreat.Properties)))
+                            {
+                                globalPreferences.AllDangers.Add(new DangerousLevelLine(source, currentThreat.Name,
+                                    currentThreat.Properties));
+                            }
+                        }));
+
+                globalPreferences.Items = full.ThreatPossibilities.ToList().Select(x => new ThreatModel
+                {
+                    Id = x.Threat.ThreatId,
+                    Name = x.Threat.Name,
+                    Description = x.Threat.Description,
+                    ExposureSubject = globalPreferences.AllItems
+                        .FirstOrDefault(y => y.Id == x.Threat.ThreatId)
+                        .ExposureSubject,
+                    Source = globalPreferences.AllItems
+                        .FirstOrDefault(y => y.Id == x.Threat.ThreatId).Source,
+                    IsHasAvailabilityViolation = x.Threat.IsHasAvailabilityViolation,
+                    IsHasIntegrityViolation = x.Threat.IsHasIntegrityViolation,
+                    IsHasPrivacyViolation = x.Threat.IsHasPrivacyViolation,
+                    RiskProbabilities = x.RiskProbability
+                }).ToList();
+
+                globalPreferences.Dangers = full.ThreatDangers.ToList()
+                    .Select(x => new DangerousLevelLine(x.Source.Name, x.Threat.Name, x.Properties){DangerLevel = x.DangerLevel}).ToList();
             }
 
             return globalPreferences;
         }
 
-        public static void SaveModel(ThreatsDbContext context, GlobalPreferences preferences, List<ModelLine> model, Guid userId, string name)
+        public static void SaveModel(ThreatsDbContext context, GlobalPreferences preferences, List<ModelLine> model,
+            Guid userId, string name)
         {
-
             var allThreats = context.Threat.ToList();
             var allSources = context.Source.ToList();
             var allTargets = context.Target.ToList();
@@ -283,13 +330,15 @@ namespace ThreatsParser.FileActions
             foreach (var source in preferences.Source.Where(x => x.Item2).Select(x => x.Item1))
             {
                 var Dbsource = allSources.FirstOrDefault(x => x.Name == source);
-                modelPreferences.ModelPreferencesSource.Add(new ModelPreferencesSource{ModelPreferences = modelPreferences, Source = Dbsource});
+                modelPreferences.ModelPreferencesSource.Add(new ModelPreferencesSource
+                    {ModelPreferences = modelPreferences, Source = Dbsource});
             }
 
             foreach (var target in preferences.Targets.Where(x => x.Item2).Select(x => x.Item1))
             {
                 var DbTarget = allTargets.FirstOrDefault(x => x.Name == target);
-                modelPreferences.ModelPreferencesTarget.Add(new ModelPreferencesTarget() { ModelPreferences = modelPreferences, Target = DbTarget });
+                modelPreferences.ModelPreferencesTarget.Add(new ModelPreferencesTarget()
+                    {ModelPreferences = modelPreferences, Target = DbTarget});
             }
 
             var newModel = new Model
@@ -303,7 +352,7 @@ namespace ThreatsParser.FileActions
             var currentUser = context.User.FirstOrDefault(x => x.Id == userId);
             if (currentUser.Model == null)
             {
-                currentUser.Model = new List<Model>(){newModel};
+                currentUser.Model = new List<Model>() {newModel};
             }
             else
             {
@@ -334,7 +383,13 @@ namespace ThreatsParser.FileActions
             context.User.Update(currentUser);
 
             context.SaveChanges();
+        }
 
+        public static void DeleteModel(ThreatsDbContext context, Guid modelId)
+        {
+            var model = context.Model.FirstOrDefault(x => x.Id == modelId);
+            context.Model.Remove(model);
+            context.SaveChanges();
         }
     }
 }
