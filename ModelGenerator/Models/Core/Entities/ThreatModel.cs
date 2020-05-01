@@ -10,21 +10,21 @@ namespace ThreatsParser.Entities
 {
     public class ThreatModel
     {
-        public int Id { get; }
+        public int Id { get; set; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public List<string> Source { get; }
+        public List<string> Source { get; set; }
 
-        public List<string> ExposureSubject { get; }
+        public List<string> ExposureSubject { get; set; }
 
-        public bool IsHasPrivacyViolation { get; }
+        public bool IsHasPrivacyViolation { get; set; }
 
-        public bool IsHasIntegrityViolation { get; }
+        public bool IsHasIntegrityViolation { get; set; }
 
-        public bool IsHasAvailabilityViolation { get; }
+        public bool IsHasAvailabilityViolation { get; set; }
 
         public RiskProbabilities RiskProbabilities { get; set; }
         
@@ -69,6 +69,11 @@ namespace ThreatsParser.Entities
 
                 return result.Count > 0 ? string.Join(", ", result) : "Нарушения отсуствуют";
             }
+        }
+
+        public ThreatModel()
+        {
+
         }
 
         public ThreatModel(Threat threat)

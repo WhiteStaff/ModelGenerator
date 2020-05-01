@@ -1,28 +1,29 @@
 ﻿@model ModelGenerator.Views.Creation.SecondStepModel
 @{
     <form method="post">
+        <div class="container" style="height: 800px; overflow: scroll">
         <table class="table">
             <tr>
-                <th>Id</th>
-                <th>Customer</th>
-                <th>Date</th>
+                <th>Номер</th>
+                <th>Название</th>
+                <th>Вероятность</th>
             </tr>
             @for (var i = 0; i < Model.Preferences.Items.Count(); i++)
             {
                 <tr>
                     <td>
-                        <input type="hidden" asp-for="Ids" />
                         @Model.Preferences.Items[i].Id
                     </td>
                     <td>@Model.Preferences.Items[i].Name</td>
                     <td>
-                        @Html.DropDownListFor(s => s.Risks, Model.Risk)
+                        @Html.DropDownListFor(s => s.Risks[i], Model.Risk)
                     </td>
                 </tr>
 
             }
         </table>
-        <button asp-action="FirstStepHelper" asp-controller="Creation"> Назад</button>
+        </div>
+        <button asp-action="FirstStepBack" asp-controller="Creation"> Назад</button>
         <button asp-action="ThirdStep" asp-controller="Creation"> Далее</button>
     </form>
 }

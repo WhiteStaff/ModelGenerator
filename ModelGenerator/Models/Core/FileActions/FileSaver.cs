@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.IO;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -14,91 +15,99 @@ namespace ThreatsParser.FileActions
             //TODO logic to save
         }
 
-        private static void SaveModel(string path, List<ModelLine> model)
+        public static byte[] SaveModel(List<ModelLine> model)
         {
-            using (WordprocessingDocument doc =
-                WordprocessingDocument.Create(path, WordprocessingDocumentType.Document))
+            byte[] result;
+            using (var stream = new MemoryStream())
             {
-                Table table = new Table();
-
-                // Create a TableProperties object and specify its border information.
-                TableProperties tblProp = new TableProperties(
-                    new TableBorders(
-                        new TopBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        },
-                        new BottomBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        },
-                        new LeftBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        },
-                        new RightBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        },
-                        new InsideHorizontalBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        },
-                        new InsideVerticalBorder()
-                        {
-                            Val =
-                            new EnumValue<BorderValues>(BorderValues.Apples),
-                            Size = 4
-                        }
-                    )
-                );
-                table.AppendChild<TableProperties>(tblProp);
-
-
-                table.Append(CreateRow(new ModelLine
+                using (WordprocessingDocument doc =
+                    WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document))
                 {
-                    Id = "№ п/п",
-                    Target = "Объект воздействия",
-                    Source = "Источник угрозы",
-                    ThreatName = "Наименование УБИ",
-                    Possibility = "Вероятность",
-                    Y = "Коэф. реализуемости Y",
-                    Danger = "Опасность",
-                    isActual = "Актуальность",
-                }));
+                    Table table = new Table();
 
-                foreach (var modelLine in model)
-                {
-                    table.Append(CreateRow(modelLine));
+                    // Create a TableProperties object and specify its border information.
+                    TableProperties tblProp = new TableProperties(
+                        new TableBorders(
+                            new TopBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            },
+                            new BottomBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            },
+                            new LeftBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            },
+                            new RightBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            },
+                            new InsideHorizontalBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            },
+                            new InsideVerticalBorder()
+                            {
+                                Val =
+                                    new EnumValue<BorderValues>(BorderValues.Apples),
+                                Size = 4
+                            }
+                        )
+                    );
+                    table.AppendChild<TableProperties>(tblProp);
 
-                    /*var prevCell = (TableCell)((TableRow) table.LastChild).ChildElements[1];
-                    if (prevCell != null)
+
+                    table.Append(CreateRow(new ModelLine
                     {
-                        if ()
-                    }*/
+                        Id = "№ п/п",
+                        Target = "Объект воздействия",
+                        Source = "Источник угрозы",
+                        ThreatName = "Наименование УБИ",
+                        Possibility = "Вероятность",
+                        Y = "Коэф. реализуемости Y",
+                        Danger = "Опасность",
+                        isActual = "Актуальность",
+                    }));
+
+                    foreach (var modelLine in model)
+                    {
+                        table.Append(CreateRow(modelLine));
+
+                        /*var prevCell = (TableCell)((TableRow) table.LastChild).ChildElements[1];
+                        if (prevCell != null)
+                        {
+                            if ()
+                        }*/
+                    }
+
+                    MainDocumentPart mainPart = doc.AddMainDocumentPart();
+
+                    mainPart.Document = new Document(
+                        new Body());
+
+                    // Append the table to the document.
+                    doc.MainDocumentPart.Document.Body.Append(table);
+
+
+                    doc.MainDocumentPart.Document.Save();
                 }
 
-                MainDocumentPart mainPart = doc.AddMainDocumentPart();
-
-                mainPart.Document = new Document(
-                    new Body());
-
-                // Append the table to the document.
-                doc.MainDocumentPart.Document.Body.Append(table);
-                
-
-                doc.MainDocumentPart.Document.Save();
+                result = stream.ToArray();
             }
+
+            return result;
         }
 
         private static TableRow CreateRow(ModelLine modelLine)

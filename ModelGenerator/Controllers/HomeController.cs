@@ -41,7 +41,7 @@ namespace ModelGenerator.Controllers
 
         public IActionResult Create()
         {
-            return RedirectToAction("FirstStep", "Creation");
+            return RedirectToAction("Start", "Creation");
         }
 
         [HttpGet, Route("createDb")]

@@ -12,8 +12,7 @@ namespace ModelGenerator.Views.Creation
     public class FirstStepModel : PageModel
     {
         private GlobalPreferences _preferences;
-        [BindProperty]
-        public string Values { get; set; }
+        
         public GlobalPreferences Preferences { get; set; }
 
         public FirstStepModel(GlobalPreferences preferences)

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,8 +34,12 @@ namespace ModelGenerator
                 {
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
-
-            services.AddControllersWithViews();
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+            services.AddSession();
+            services.AddMemoryCache();
+            services.AddMvc();
+            services.AddControllersWithViews()
+                .AddSessionStateTempDataProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +63,9 @@ namespace ModelGenerator
             app.UseAuthentication();    
             app.UseAuthorization();
             app.UseAuthentication();
+            app.UseCookiePolicy();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

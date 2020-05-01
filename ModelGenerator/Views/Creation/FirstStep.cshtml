@@ -4,6 +4,8 @@
     <div class="container">
         <div class="row">
             <div class="col-6">
+                <label>Возможные источники угроз</label>
+                <br />
                 @foreach (var source in Model.Preferences.Source)
                 {
                     <input name="Values" type="checkbox" value="@source.Item1" checked="@source.Item2" />
@@ -12,12 +14,35 @@
                 }
             </div>
             <div class="col-6">
-                @foreach (var source in Model.Preferences.Targets)
-                {
-                    <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2" />
-                    @source.Item1
-                    <br />
-                }
+                <label>Возможные объекты воздействия</label>
+                <div style="height: 600px; overflow: scroll">
+                    @foreach (var source in Model.Preferences.Targets)
+                    {
+                        <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2"/>
+                        @source.Item1
+                        <br/>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label>Опасность нарушения конциденциальности</label><br /><br />
+                <input type="radio" value="Low" id="Pri" name="Pri" checked="true"/>Низкий<br/>
+                <input type="radio" value="Medium" id="Pri" name="Pri"/>Средний<br/>
+                <input type="radio" value="High" id="Pri" name="Pri"/>Высокий<br/>
+            </div>
+            <div class="col-4">
+                <label>Опасность нарушения доступности</label><br /><br />
+                <input type="radio" value="Low" id="Ava" name="Ava" checked="true" />Низкий<br />
+                <input type="radio" value="Medium" id="Ava" name="Ava" />Средний<br />
+                <input type="radio" value="High" id="Ava" name="Ava" />Высокий<br />
+            </div>
+            <div class="col-4">
+                <label>Опасность нарушения целостности</label><br /><br />
+                <input type="radio" value="Low" id="Int" name="Int" checked="true" />Низкий<br />
+                <input type="radio" value="Medium" id="Int" name="Int" />Средний<br />
+                <input type="radio" value="High" id="Int" name="Int" />Высокий<br />
             </div>
         </div>
         <button asp-action="FirstStepHelper" asp-controller="Creation"> Отмена</button>

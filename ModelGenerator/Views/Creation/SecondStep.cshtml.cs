@@ -21,13 +21,13 @@ namespace ModelGenerator.Views.Creation
         };
 
         public List<RiskProbabilities> Risks { get; set; }
-        public List<string> Ids { get; set; }
+        public List<int> Ids { get; set; }
 
         public SecondStepModel(GlobalPreferences preferences)
         {
             Preferences = preferences;
             Risks = preferences.Items.Select(x => x.RiskProbabilities).ToList();
-            Ids = preferences.Items.Select(x => x.Id.ToString()).ToList();
+            Ids = preferences.Items.Select(x => x.Id).ToList();
         }
 
         public void OnGet()

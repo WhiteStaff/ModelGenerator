@@ -1,0 +1,32 @@
+﻿@model ModelGenerator.Views.Creation.PreviewModel
+@{
+    <form method="post">
+        <div class="container" style="height: 800px; overflow: scroll">
+            <table class="table" style="height: 800px; overflow: scroll">
+                <tr>
+                    <th>№ п/п</th>
+                    <th>Название угрозы</th>
+                    <th>Объект воздействия</th>
+                    <th>Источник угрозы</th>
+                    <th>Коэф реализуемости Y</th>
+                    <th>Опасность</th>
+                    <th>Актуальность</th>
+                </tr>
+                @foreach (var line in @Model.Model)
+                {
+                    <tr>
+                        <td>@line.Id</td>
+                        <td>@line.ThreatName</td>
+                        <td>@line.Target</td>
+                        <td>@line.Source</td>
+                        <td>@line.Y</td>
+                        <td>@line.Danger</td>
+                        <td>@line.isActual</td>
+                    </tr>
+                }
+            </table>
+        </div>
+        <button asp-action="ForthStepBack" asp-controller="Creation"> Назад</button>
+        <button asp-action="Download" asp-controller="Creation"> Скачать</button>
+    </form>
+}

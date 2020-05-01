@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models.Enums;
 using ModelGenerator.Views.Creation;
+using Newtonsoft.Json;
 using ThreatsParser.Entities;
 using ThreatsParser.FileActions;
+using TreatsParser.Core;
 
 namespace ModelGenerator.Controllers
 {
@@ -23,27 +27,45 @@ namespace ModelGenerator.Controllers
         public CreationController(ThreatsDbContext context)
         {
             _context = context;
-            Preferences = FileCreator.Initialize(context, Guid.Empty);
         }
 
-
-        public IActionResult FirstStep(List<string> values, List<string> targets)
+        public IActionResult Start()
         {
+            Preferences = FileCreator.Initialize(_context, Guid.Empty);
+            var json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
             return View("FirstStep", new FirstStepModel(Preferences));
         }
 
-        public IActionResult FirstStepHelper(List<string> values, List<string> targets)
+        public IActionResult FirstStep()
         {
-            Preferences.Source = Preferences.Source.Select(x => (x.Item1, values.Contains(x.Item1))).ToList();
-            Preferences.Targets = Preferences.Targets.Select(x => (x.Item1, targets.Contains(x.Item1))).ToList();
+            var json = TempData.Peek("qw") as string ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
             return View("FirstStep", new FirstStepModel(Preferences));
         }
 
-        public IActionResult SecondStep(List<string> values, List<string> targets)
+        public IActionResult FirstStepBack(List<RiskProbabilities> Risks)
         {
+            var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            for (var i = 0; i < Preferences.Items.Count; i++)
+            {
+                Preferences.Items[i].RiskProbabilities = Risks[i];
+            }
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("FirstStep", new FirstStepModel(Preferences));
+        }
+
+        public IActionResult SecondStep(List<string> values, List<string> targets, DangerLevel Pri, DangerLevel Ava, DangerLevel Int)
+        {
+            var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
             Preferences.Source = Preferences.Source.Select(x => (x.Item1, values.Contains(x.Item1))).ToList();
             Preferences.Targets = Preferences.Targets.Select(x => (x.Item1, targets.Contains(x.Item1))).ToList();
-            Preferences.Items = Preferences.AllItems
+            var temp = Preferences.AllItems
                 .Where(x => x.Source
                     .Any(y => Preferences.Source
                         .Where(x2 => x2.Item2)
@@ -55,13 +77,170 @@ namespace ModelGenerator.Controllers
                             .Where(x2 => x2.Item2)
                             .Select(k => k.Item1)
                             .Contains(y)))
+                .OrderBy(x => x.Id)
                 .ToList();
+            foreach (var threatModel in temp)
+            {
+                var curr = Preferences.Items.FirstOrDefault(x => threatModel.Id == x.Id);
+                if (curr != null)
+                {
+                    threatModel.RiskProbabilities = curr.RiskProbabilities;
+                }
+            }
+
+            Preferences.Items = temp;
+
+            foreach (var line in Preferences.AllDangers)
+            {
+                if (line.Properties.Contains("конф"))
+                {
+                    line.DangerLevel = Pri;
+                }
+
+                if (line.Properties.Contains("дост") && line.DangerLevel < Ava)
+                {
+                    line.DangerLevel = Ava;
+                }
+
+                if (line.Properties.Contains("цело") && line.DangerLevel < Int)
+                {
+                    line.DangerLevel = Int;
+                }
+            }
+
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
             return View("SecondStep", new SecondStepModel(Preferences));
         }
 
-        public IActionResult ThirdStep(List<string> Ids, List<RiskProbabilities> Risks)
+        public IActionResult SecondStepBack(List<DangerLevel> Dangers)
         {
-            return Ok();
+            var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            for (var i = 0; i < Preferences.Dangers.Count; i++)
+            {
+                Preferences.Dangers[i].DangerLevel = Dangers[i];
+            }
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("SecondStep", new SecondStepModel(Preferences));
+        }
+
+        public IActionResult ThirdStep(List<RiskProbabilities> Risks)
+        {
+            var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            for (var i = 0; i < Preferences.Items.Count; i++)
+            {
+                Preferences.Items[i].RiskProbabilities = Risks[i];
+            }
+            Preferences.Dangers = Preferences.AllDangers
+                .Where(x =>
+                    Preferences.Source
+                        .Where(y => y.Item2)
+                        .Select(y => y.Item1)
+                        .Contains(x.Source) &&
+                    Preferences.Items
+                        .Select(y => y.Name)
+                        .Contains(x.ThreatName))
+                .OrderBy(x => x.ThreatName)
+                .ToList();
+
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("ThirdStep", new ThirdStepModel(Preferences));
+        }
+
+        public IActionResult ThirdStepBack(LocationCharacteristic LocationCharacteristic,
+            NetworkCharacteristic NetworkCharacteristic,
+            PersonalDataActionCharacteristics PersonalDataActionCharacteristics,
+            PersonalDataPermissionSplit PersonalDataPermissionSplit,
+            OtherDBConnections OtherDBConnections,
+            AnonymityLevel AnonymityLevel,
+            PersonalDataSharingLevel PersonalDataSharingLevel)
+        {
+            var json = TempData["qw"] as string ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            Preferences.InitialSecurityLevel = new InitialSecurityLevel
+            {
+                AnonymityLevel = AnonymityLevel,
+                NetworkCharacteristic = NetworkCharacteristic,
+                OtherDbConnections = OtherDBConnections,
+                PersonalDataActionCharacteristics = PersonalDataActionCharacteristics,
+                PersonalDataPermissionSplit = PersonalDataPermissionSplit,
+                PersonalDataSharingLevel = PersonalDataSharingLevel,
+                TerritorialLocation = LocationCharacteristic
+            };
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("ThirdStep", new ThirdStepModel(Preferences));
+        }
+
+        public IActionResult ForthStep(List<DangerLevel> Dangers)
+        {
+            var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            for (var i = 0; i < Preferences.Dangers.Count; i++)
+            {
+                Preferences.Dangers[i].DangerLevel = Dangers[i];
+            }
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("ForthStep", new ForthStepModel(Preferences));
+        }
+
+        public IActionResult ForthStepBack()
+        {
+            var json = (TempData.Peek("qw") as string) ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            return View("ForthStep", new ForthStepModel(Preferences));
+        }
+
+        public IActionResult Preview(LocationCharacteristic LocationCharacteristic,
+            NetworkCharacteristic NetworkCharacteristic,
+            PersonalDataActionCharacteristics PersonalDataActionCharacteristics,
+            PersonalDataPermissionSplit PersonalDataPermissionSplit,
+            OtherDBConnections OtherDBConnections,
+            AnonymityLevel AnonymityLevel,
+            PersonalDataSharingLevel PersonalDataSharingLevel)
+        {
+            var json = TempData["qw"] as string ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            Preferences.InitialSecurityLevel = new InitialSecurityLevel
+            {
+                AnonymityLevel = AnonymityLevel,
+                NetworkCharacteristic = NetworkCharacteristic,
+                OtherDbConnections = OtherDBConnections,
+                PersonalDataActionCharacteristics = PersonalDataActionCharacteristics,
+                PersonalDataPermissionSplit = PersonalDataPermissionSplit,
+                PersonalDataSharingLevel = PersonalDataSharingLevel,
+                TerritorialLocation = LocationCharacteristic
+            };
+            json = JsonConvert.SerializeObject(Preferences);
+            TempData["qw"] = json;
+            HttpContext.Session.SetString("pref", json);
+            return View("Preview", new PreviewModel(Preferences));
+        }
+
+        public IActionResult Download()
+        {
+            var json = TempData["qw"] as string ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            var model = ModelGeneration.GenerateModelForPreview(Preferences)
+                .OrderBy(x => x.ThreatName)
+                .ThenBy(x => x.Target)
+                .ThenBy(x => x.Source)
+                .Select((x, y) => new ModelLine(y + 1, x))
+                .ToList();
+            var bytes = FileSaver.SaveModel(model);
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                $"123.docx");
         }
 
     }
