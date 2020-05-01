@@ -1,12 +1,37 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ModelGenerator.Views.Home.IndexModel
+
+@{
+    ViewData["Title"] = "Courses";
 }
 
-    <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    @using (Html.BeginForm("Create", "Home", FormMethod.Get))
-    {
-        <input type="submit" value="Новая модель"/>
-    }
-    </div>
+    <h1>Созданные модели</h1>
+
+    <form method="post">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Дата создания</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Models)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreationTime)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Изменить", actionName: "PreviewExist", controllerName: "Creation", new{Id = item.Id})|
+                        @Html.ActionLink("Удалить", actionName: "PreviewExist", controllerName: "Creation", new { Id = item.Id })|
+                        @Html.ActionLink("Скачать", actionName: "PreviewExist", controllerName: "Creation", new { Id = item.Id })
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <input type="submit" asp-action="Start" asp-controller="Creation" value="Новая модель"/>
+    </form>

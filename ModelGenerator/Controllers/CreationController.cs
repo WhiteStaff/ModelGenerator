@@ -63,6 +63,9 @@ namespace ModelGenerator.Controllers
         {
             var json = (TempData["qw"] as string) ?? HttpContext.Session.GetString("pref");
             Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            Preferences.InitialSecurityLevel.PrivacyViolationDanger = Pri;
+            Preferences.InitialSecurityLevel.IntegrityViolationDanger = Int;
+            Preferences.InitialSecurityLevel.AvailabilityViolationDanger = Ava;
             Preferences.Source = Preferences.Source.Select(x => (x.Item1, values.Contains(x.Item1))).ToList();
             Preferences.Targets = Preferences.Targets.Select(x => (x.Item1, targets.Contains(x.Item1))).ToList();
             var temp = Preferences.AllItems
@@ -227,8 +230,9 @@ namespace ModelGenerator.Controllers
             return View("Preview", new PreviewModel(Preferences));
         }
 
-        public IActionResult Download()
+        public IActionResult Download(string Name)
         {
+            if (string.IsNullOrEmpty(Name)) Name = "No Name";
             var json = TempData["qw"] as string ?? HttpContext.Session.GetString("pref");
             Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
             var model = ModelGeneration.GenerateModelForPreview(Preferences)
@@ -240,7 +244,28 @@ namespace ModelGenerator.Controllers
             var bytes = FileSaver.SaveModel(model);
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                $"123.docx");
+                $"{Name}.docx");
+        }
+
+        public IActionResult SaveModel(string Name)
+        {
+            if (string.IsNullOrEmpty(Name)) Name = "No Name"; 
+            var json = TempData["qw"] as string ?? HttpContext.Session.GetString("pref");
+            Preferences = JsonConvert.DeserializeObject<GlobalPreferences>(json);
+            var model = ModelGeneration.GenerateModelForPreview(Preferences)
+                .OrderBy(x => x.ThreatName)
+                .ThenBy(x => x.Target)
+                .ThenBy(x => x.Source)
+                .Select((x, y) => new ModelLine(y + 1, x))
+                .ToList();
+            var userId = _context.User.FirstOrDefault(x => x.Login == User.Identity.Name).Id;
+            FileCreator.SaveModel(_context, Preferences, model, userId, Name);
+            return Ok();
+        }
+
+        public IActionResult PreviewExist(Guid id)
+        {
+            return Ok();
         }
 
     }

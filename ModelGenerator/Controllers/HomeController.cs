@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models;
 using ModelGenerator.Models;
+using ModelGenerator.Views.Home;
 using ThreatsParser.Entities;
 using ThreatsParser.FileActions;
 
@@ -35,8 +36,8 @@ namespace ModelGenerator.Controllers
         
         public IActionResult Index()
         {
-            //FileCreator.SetParsedData(_context);
-            return View();
+            var models = _context.User.Include(x => x.Model).FirstOrDefault(x => x.Login == User.Identity.Name).Model.ToList();
+            return View("Index", new IndexModel(models));
         }
 
         public IActionResult Create()
@@ -65,15 +66,22 @@ namespace ModelGenerator.Controllers
             var sha1 = new SHA1CryptoServiceProvider();
             var data = Encoding.ASCII.GetBytes(Password);
 
-            _context.Add(new User
+            if (_context.User.FirstOrDefault(x => x.Login == Login) == null)
             {
-                Id = Guid.NewGuid(),
-                Login = Login,
-                Name = Name,
-                Password = Encoding.ASCII.GetString( sha1.ComputeHash(data)),
-            });
+                _context.Add(new User
+                {
+                    Id = Guid.NewGuid(),
+                    Login = Login,
+                    Name = Name,
+                    Password = Encoding.ASCII.GetString(sha1.ComputeHash(data)),
+                });
 
-            _context.SaveChanges();
+                _context.SaveChanges();
+            }
+            else
+            {
+                View("Creation");
+            }
 
             return RedirectToAction("Login", "Account");
         }

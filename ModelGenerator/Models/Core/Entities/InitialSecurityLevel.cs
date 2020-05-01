@@ -20,6 +20,12 @@ namespace ThreatsParser.Entities
 
         public PersonalDataSharingLevel PersonalDataSharingLevel { get; set; }
 
+        public DangerLevel PrivacyViolationDanger { get; set; }
+
+        public DangerLevel IntegrityViolationDanger { get; set; }
+
+        public DangerLevel AvailabilityViolationDanger { get; set; }
+
         #region Coefficients Getters
 
         public int TerritorialLocationCoef

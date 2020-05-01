@@ -29,6 +29,19 @@ namespace TreatsParser.Core.Helpers
             }
         }
 
+        public static DangerLevel ResolveDanger(this string level)
+        {
+            switch (level)
+            {
+                case "Низкая":
+                    return DangerLevel.Low;
+                case "Средняя":
+                    return DangerLevel.Medium;
+                default:
+                    return DangerLevel.High;
+            }
+        }
+
         public static bool ResolveActual(DangerLevel dangerLevel, RiskProbabilities risk)
         {
             if (risk == RiskProbabilities.Unlikely) return false;
@@ -84,18 +97,22 @@ namespace TreatsParser.Core.Helpers
             return char.ToUpper(s[0]) + s.Substring(1);
         }
 
-        public static string GetEnumDescription<T>(string value)
+        public static RiskProbabilities ResolvePossibility(this string s)
         {
-            Type type = typeof(T);
-            var name = Enum.GetNames(type).Where(f => f.Equals(value, StringComparison.CurrentCultureIgnoreCase)).Select(d => d).FirstOrDefault();
-
-            if (name == null)
+            switch (s)
             {
-                return string.Empty;
+                case "Низкая":
+                    return RiskProbabilities.Low;
+                    break;
+                case "Средняя":
+                    return RiskProbabilities.Medium;
+                    break;
+                case "Высокая":
+                    return RiskProbabilities.High;
+                    break;
+                default:
+                    return RiskProbabilities.Unlikely;
             }
-            var field = type.GetField(name);
-            var customAttribute = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return customAttribute.Length > 0 ? ((DescriptionAttribute)customAttribute[0]).Description : name;
         }
     }
 }

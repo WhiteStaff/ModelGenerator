@@ -25,6 +25,8 @@ namespace ThreatsParser.Entities
             set => _isActual = value == "True" || value == "Актуальная";
         }
 
+        public bool GetActual => _isActual;
+
         public ModelLine()
         {
         }

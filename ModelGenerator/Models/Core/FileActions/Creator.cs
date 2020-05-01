@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models;
@@ -10,6 +11,9 @@ using OfficeOpenXml;
 using ThreatsParser.Entities;
 using ThreatsParser.Exceptions;
 using TreatsParser.Core;
+using TreatsParser.Core.Helpers;
+using ModelLine = ThreatsParser.Entities.ModelLine;
+using DbModelLine = ModelGenerator.DataBase.Models.ModelLine;
 
 
 namespace ThreatsParser.FileActions
@@ -174,6 +178,7 @@ namespace ThreatsParser.FileActions
         public static GlobalPreferences Initialize(ThreatsDbContext context, Guid modelId)
         {
             var globalPreferences = new GlobalPreferences();
+            globalPreferences.InitialSecurityLevel = new InitialSecurityLevel();
             globalPreferences.Items = globalPreferences.AllItems =
                 context.Threat
                     .Include(x => x.ThreatSource)
@@ -233,6 +238,103 @@ namespace ThreatsParser.FileActions
             }
 
             return globalPreferences;
+        }
+
+        public static void SaveModel(ThreatsDbContext context, GlobalPreferences preferences, List<ModelLine> model, Guid userId, string name)
+        {
+
+            var allThreats = context.Threat.ToList();
+            var allSources = context.Source.ToList();
+            var allTargets = context.Target.ToList();
+
+            var threatsDangers = preferences.Dangers.Select(x => new ThreatDanger
+            {
+                Id = Guid.NewGuid(),
+                ThreatId = allThreats.FirstOrDefault(y => y.Name == x.ThreatName).Id,
+                SourceId = allSources.FirstOrDefault(y => y.Name == x.Source).Id,
+                Properties = x.Properties,
+                DangerLevel = x.DangerLevel
+            }).ToList();
+
+            var threatPossibilities = preferences.Items.Select(x => new ThreatPossibility
+            {
+                Id = Guid.NewGuid(),
+                ThreatId = allThreats.FirstOrDefault(y => y.ThreatId == x.Id).Id,
+                RiskProbability = x.RiskProbabilities
+            }).ToList();
+
+            var modelPreferences = new ModelPreferences
+            {
+                Id = Guid.NewGuid(),
+                ThreatPossibilities = threatPossibilities,
+                ThreatDangers = threatsDangers,
+                AnonymityLevel = preferences.InitialSecurityLevel.AnonymityLevel,
+                LocationCharacteristic = preferences.InitialSecurityLevel.TerritorialLocation,
+                NetworkCharacteristic = preferences.InitialSecurityLevel.NetworkCharacteristic,
+                OtherDBConnections = preferences.InitialSecurityLevel.OtherDbConnections,
+                PersonalDataActionCharacteristics = preferences.InitialSecurityLevel.PersonalDataActionCharacteristics,
+                PersonalDataPermissionSplit = preferences.InitialSecurityLevel.PersonalDataPermissionSplit,
+                PersonalDataSharingLevel = preferences.InitialSecurityLevel.PersonalDataSharingLevel,
+                PrivacyViolationDanger = preferences.InitialSecurityLevel.PrivacyViolationDanger,
+                IntegrityViolationDanger = preferences.InitialSecurityLevel.IntegrityViolationDanger,
+                AvailabilityViolationDanger = preferences.InitialSecurityLevel.AvailabilityViolationDanger,
+            };
+
+            foreach (var source in preferences.Source.Where(x => x.Item2).Select(x => x.Item1))
+            {
+                var Dbsource = allSources.FirstOrDefault(x => x.Name == source);
+                modelPreferences.ModelPreferencesSource.Add(new ModelPreferencesSource{ModelPreferences = modelPreferences, Source = Dbsource});
+            }
+
+            foreach (var target in preferences.Targets.Where(x => x.Item2).Select(x => x.Item1))
+            {
+                var DbTarget = allTargets.FirstOrDefault(x => x.Name == target);
+                modelPreferences.ModelPreferencesTarget.Add(new ModelPreferencesTarget() { ModelPreferences = modelPreferences, Target = DbTarget });
+            }
+
+            var newModel = new Model
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                CreationTime = DateTime.Now,
+                Preferences = modelPreferences
+            };
+
+            var currentUser = context.User.FirstOrDefault(x => x.Id == userId);
+            if (currentUser.Model == null)
+            {
+                currentUser.Model = new List<Model>(){newModel};
+            }
+            else
+            {
+                currentUser.Model.Add(newModel);
+            }
+
+
+            var lines = model.Select(modelLine => new DbModelLine
+                {
+                    Id = Guid.NewGuid(),
+                    ModelId = newModel.Id,
+                    LineId = int.Parse(modelLine.Id),
+                    ThreatId = allThreats.FirstOrDefault(x => x.Name == modelLine.ThreatName).Id,
+                    TargetId = allTargets.FirstOrDefault(x => x.Name == modelLine.Target).Id,
+                    SourceId = allSources.FirstOrDefault(x => x.Name == modelLine.Source).Id,
+                    Possibility = modelLine.Possibility.ResolvePossibility(),
+                    RealisationCoefficient = modelLine.Y,
+                    DangerLevel = modelLine.Danger.ResolveDanger(),
+                    IsActual = modelLine.GetActual
+                })
+                .ToList();
+
+            context.ThreatDanger.AddRange(threatsDangers);
+            context.ThreatPossibility.AddRange(threatPossibilities);
+            context.ModelPreferences.Add(modelPreferences);
+            context.Model.Add(newModel);
+            context.ModelLine.AddRange(lines);
+            context.User.Update(currentUser);
+
+            context.SaveChanges();
+
         }
     }
 }

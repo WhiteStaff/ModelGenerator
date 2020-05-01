@@ -7,8 +7,6 @@ namespace ModelGenerator.DataBase.Models
 {
     public class ThreatSource
     {
-        
-
         public Guid ThreatId { get; set; }
 
         public Threat Threat { get; set; }
