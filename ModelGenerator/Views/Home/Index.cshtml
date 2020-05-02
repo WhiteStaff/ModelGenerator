@@ -27,7 +27,7 @@
                     <td>
                         @Html.ActionLink("Изменить", actionName: "PreviewExist", controllerName: "Creation", new{Id = item.Id})|
                         @Html.ActionLink("Удалить", actionName: "DeleteExist", controllerName: "Creation", new { Id = item.Id })|
-                        @Html.ActionLink("Скачать", actionName: "PreviewExist", controllerName: "Creation", new { Id = item.Id })
+                        @Html.ActionLink("Скачать", actionName: "DownloadExist", controllerName: "Creation", new { Id = item.Id })
                     </td>
                 </tr>
             }

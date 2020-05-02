@@ -19,6 +19,8 @@ namespace ThreatsParser.Entities
 
         public List<DangerousLevelLine> Dangers { get; set; }
 
+        public Guid ModelId { get; set; }
+
         public GlobalPreferences()
         {
             Items = new List<ThreatModel>();

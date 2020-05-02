@@ -280,7 +280,18 @@ namespace ModelGenerator.Controllers
 
         public IActionResult DownloadExist(Guid id)
         {
-            return RedirectToAction("Index", "Home");
+            Preferences = Creator.Initialize(_context, id);
+            var model = ModelGeneration.GenerateModelForPreview(Preferences)
+                .OrderBy(x => x.ThreatName)
+                .ThenBy(x => x.Target)
+                .ThenBy(x => x.Source)
+                .Select((x, y) => new ModelLine(y + 1, x))
+                .ToList();
+            var bytes = FileSaver.SaveModel(model);
+            var Name = _context.Model.FirstOrDefault(x => x.Id == id).Name;
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                $"{Name}.docx");
         }
 
     }

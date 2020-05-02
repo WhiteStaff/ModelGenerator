@@ -284,12 +284,19 @@ namespace ThreatsParser.FileActions
                     .Select(x => new DangerousLevelLine(x.Source.Name, x.Threat.Name, x.Properties){DangerLevel = x.DangerLevel}).ToList();
             }
 
+            globalPreferences.ModelId = modelId;
+
             return globalPreferences;
         }
 
         public static void SaveModel(ThreatsDbContext context, GlobalPreferences preferences, List<ModelLine> model,
             Guid userId, string name)
         {
+            if (preferences.ModelId != Guid.Empty)
+            {
+                DeleteModel(context, preferences.ModelId);
+            }
+
             var allThreats = context.Threat.ToList();
             var allSources = context.Source.ToList();
             var allTargets = context.Target.ToList();
