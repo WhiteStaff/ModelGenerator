@@ -4,35 +4,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using ModelGenerator.DataBase.Models.Enums;
 using ThreatsParser.Entities;
 
 namespace ModelGenerator.Views.Creation
 {
-    public class ForthStepModel : PageModel
+    public class ThirdStepModel : PageModel
     {
         public GlobalPreferences Preferences { get; set; }
-        public InitialSecurityLevel Level { get; set; }
-        public List<List<bool>> Flags { get; set; } = new List<List<bool>>();
+        public List<SelectListItem> Danger { set; get; } = new List<SelectListItem>{
+            new SelectListItem { Value = "0", Text = "Низкая" },
+            new SelectListItem { Value = "1", Text = "Средняя" },
+            new SelectListItem { Value = "2", Text = "Высокая" },
+        };
 
-        public ForthStepModel(GlobalPreferences preferences)
+        public List<DangerLevel> Dangers { get; set; }
+
+        public ThirdStepModel(GlobalPreferences preferences)
         {
             Preferences = preferences;
-            Level = preferences.InitialSecurityLevel ?? new InitialSecurityLevel();
-
-            for (int i = 0; i < 7; i++)
-            {
-                var list = Enumerable.Repeat(false, 7).ToList();
-                Flags.Add(list);
-            }
-
-            Flags[0][(int) Level.TerritorialLocation] = true;
-            Flags[1][(int) Level.NetworkCharacteristic] = true;
-            Flags[2][(int) Level.PersonalDataActionCharacteristics] = true;
-            Flags[3][(int) Level.PersonalDataPermissionSplit] = true;
-            Flags[4][(int) Level.OtherDbConnections] = true;
-            Flags[5][(int) Level.AnonymityLevel] = true;
-            Flags[6][(int) Level.PersonalDataSharingLevel] = true;
-
+            Dangers = preferences.Dangers.Select(x => x.DangerLevel).ToList();
         }
 
         public void OnGet()

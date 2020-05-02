@@ -10,21 +10,24 @@ using ThreatsParser.Entities;
 
 namespace ModelGenerator.Views.Creation
 {
-    public class ThirdStepModel : PageModel
+    public class SecondStepModel : PageModel
     {
         public GlobalPreferences Preferences { get; set; }
-        public List<SelectListItem> Danger { set; get; } = new List<SelectListItem>{
-            new SelectListItem { Value = "0", Text = "Низкая" },
-            new SelectListItem { Value = "1", Text = "Средняя" },
-            new SelectListItem { Value = "2", Text = "Высокая" },
+        public List<SelectListItem> Risk { set; get; } = new List<SelectListItem>{
+            new SelectListItem { Value = "0", Text = "Маловероятно" },
+            new SelectListItem { Value = "2", Text = "Низкая" },
+            new SelectListItem { Value = "5", Text = "Средняя" },
+            new SelectListItem { Value = "10", Text = "Высокая" },
         };
 
-        public List<DangerLevel> Dangers { get; set; }
+        public List<RiskProbabilities> Risks { get; set; }
+        public List<int> Ids { get; set; }
 
-        public ThirdStepModel(GlobalPreferences preferences)
+        public SecondStepModel(GlobalPreferences preferences)
         {
             Preferences = preferences;
-            Dangers = preferences.Dangers.Select(x => x.DangerLevel).ToList();
+            Risks = preferences.Items.Select(x => x.RiskProbabilities).ToList();
+            Ids = preferences.Items.Select(x => x.Id).ToList();
         }
 
         public void OnGet()

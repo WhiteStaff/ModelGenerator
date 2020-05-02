@@ -1,91 +1,31 @@
-﻿@model ModelGenerator.Views.Creation.ForthStepModel
+﻿@model ModelGenerator.Views.Creation.ThirdStepModel
 @{
     <form method="post">
-        <div class="container">
+        <div class="container" style="height: 800px; overflow: scroll">
+            <table class="table" >
+                <tr>
+                    <th>Название</th>
+                    <th>Источник</th>
+                    <th>Свойства</th>
+                    <th>Опасность</th>
+                </tr>
+                @for (var i = 0; i < Model.Preferences.Dangers.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @Model.Preferences.Dangers[i].ThreatName
+                        </td>
+                        <td>@Model.Preferences.Dangers[i].Source</td>
+                        <td>@Model.Preferences.Dangers[i].Properties</td>
+                        <td>
+                            @Html.DropDownListFor(s => s.Dangers[i], Model.Danger)
+                        </td>
+                    </tr>
 
-            <label> 1. По территориальному размещению:</label><br /><br />
-            <input type="radio" value="Government" id="LocationCharacteristic" name="LocationCharacteristic" checked="@Model.Flags[0][0]" />
-            Распределенная ИСПДн, которая охватывает несколько областей, краев, округов или государство в целом;
-            <br />
-            <input type="radio" value="City" id="LocationCharacteristic" name="LocationCharacteristic" checked="@Model.Flags[0][1]" />
-            Городская ИСПДн, охватывающая не более одного населенного пункта (города, поселка);
-            <br />
-            <input type="radio" value="Cooperative" id="LocationCharacteristic" name="LocationCharacteristic" checked="@Model.Flags[0][2]" />
-            Корпоративная распределенная ИСПДн, охватывающая многие подразделения одной организации;
-            <br />
-            <input type="radio" value="SeveralLocal" id="LocationCharacteristic" name="LocationCharacteristic" checked="@Model.Flags[0][3]" />
-            Локальная (кампусная) ИСПДн, развернутая в пределах нескольких близко расположенных зданий;
-            <br />
-            <input type="radio" value="SingleLocal" id="LocationCharacteristic" name="LocationCharacteristic" checked="@Model.Flags[0][4]" />
-            Локальная ИСПДн, развернутая в пределах одного здания
-            <br /><br />
-
-            <label>2. По наличию соединения с сетями общего пользования:</label><br /><br />
-            <input type="radio" value="MultiPointPublic" id="NetworkCharacteristic" name="NetworkCharacteristic"  checked="@Model.Flags[1][0]" />
-            ИСПДн, имеющая многоточечный выход в сеть общего пользования;
-            <br />
-            <input type="radio" value="OnePointPublic" id="NetworkCharacteristic" name="NetworkCharacteristic" checked="@Model.Flags[1][1]" />
-            ИСПДн, имеющая одноточечный выход в сеть общего пользования;
-            <br />
-            <input type="radio" value="OnePointLocal" id="NetworkCharacteristic" name="NetworkCharacteristic" checked="@Model.Flags[1][2]" />
-            ИСПДн, физически отделенная от сети общего пользования
-            <br /><br />
-
-            <label> 3. По встроенным (легальным) операциям с записями баз персональных данных:</label><br /><br />
-            <input type="radio" value="ReadWrite" id="PersonalDataActionCharacteristics" name="PersonalDataActionCharacteristics" checked="@Model.Flags[2][0]" />
-            Чтение, поиск;
-            <br />
-            <input type="radio" value="WriteDeleteSort" id="PersonalDataActionCharacteristics" name="PersonalDataActionCharacteristics"  checked="@Model.Flags[2][1]"/>
-            Запись, удаление, сортировка;
-            <br />
-            <input type="radio" value="ModificationTransfer" id="PersonalDataActionCharacteristics" name="PersonalDataActionCharacteristics"  checked="@Model.Flags[2][2]"/>
-            Модификация, передача
-            <br /><br />
-
-            <label> 4. По разграничению доступа к персональным данным:</label><br /><br />
-            <input type="radio" value="SomeStaff" id="PersonalDataPermissionSplit" name="PersonalDataPermissionSplit"  checked="@Model.Flags[3][0]" />
-            ИСПДн, к которой имеют доступ определенные перечнем сотрудники организации, являющейся владельцем ИСПДн, либо субъект ПДн;
-            <br />
-            <input type="radio" value="AllStaff" id="PersonalDataPermissionSplit" name="PersonalDataPermissionSplit"  checked="@Model.Flags[3][1]" />
-            ИСПДн, к которой имеют доступ все сотрудники организации, являющейся владельцем ИСПДн;
-            <br />
-            <input type="radio" value="OpenAccess" id="PersonalDataPermissionSplit" name="PersonalDataPermissionSplit"  checked="@Model.Flags[3][2]" />
-            ИСПДн с открытым доступом
-            <br /><br />
-
-            <label> 5. По наличию соединений с другими базами ПДн иных ИСПДн:</label><br /><br />
-            <input type="radio" value="OtherDb" id="OtherDbConnections" name="OtherDbConnections"  checked="@Model.Flags[4][0]" />
-            Интегрированная ИСПДн (организация использует несколько баз ПДн ИСПДн, при этом организация не является владельцем всех используемых баз ПДн);
-            <br />
-            <input type="radio" value="OneDb" id="OtherDbConnections" name="OtherDbConnections"   checked="@Model.Flags[4][1]"/>
-            ИСПДн, в которой используется одна база ПДн, принадлежащая организации – владельцу данной ИСПДн
-            <br /><br />
-
-
-            <label> 6. По уровню обобщения (обезличивания) ПДн:</label><br /><br />
-            <input type="radio" value="FullyAnonymous" id="AnonymityLevel" name="AnonymityLevel"  checked="@Model.Flags[5][0]" />
-            ИСПДн, в которой предоставляемые пользователю данные являются обезличенными (на уровне организации, отрасли, области, региона и т.д.);
-            <br />
-            <input type="radio" value="OnlyInside" id="AnonymityLevel" name="AnonymityLevel"  checked="@Model.Flags[5][1]"/>
-            ИСПДн, в которой данные обезличиваются только при передаче в другие организации и не обезличены при предоставлении пользователю в организации;
-            <br />
-            <input type="radio" value="NoAnonymous" id="AnonymityLevel" name="AnonymityLevel"   checked="@Model.Flags[5][2]"/>
-            ИСПДн, в которой предоставляемые пользователю данные не являются обезличенными (т.е. присутствует информация, позволяющая идентифицировать субъекта ПДн)
-            <br /><br />
-
-            <label>
-                      7. По объему  ПДн, которые предоставляются  сторонним пользователям ИСПДн без предварительной обработки:</label><br /><br />
-            <input type="radio" value="Full" id="PersonalDataSharingLevel" name="PersonalDataSharingLevel"   checked="@Model.Flags[6][0]" />
-            ИСПДн, предоставляющая всю базу данных с ПДн;
-            <br />
-            <input type="radio" value="Partly" id="PersonalDataSharingLevel" name="PersonalDataSharingLevel"  checked="@Model.Flags[6][1]"/>
-            ИСПДн, предоставляющая часть ПДн
-            <br />
-            <input type="radio" value="Nothing" id="PersonalDataSharingLevel" name="PersonalDataSharingLevel"  checked="@Model.Flags[6][2]" />
-            ИСПДн, не предоставляющая никакой информации.
-            <br /><br />
+                }
+            </table>
         </div>
-        <button asp-action="ThirdStepBack" asp-controller="Creation"> Отмена</button>
+        <button asp-action="SecondStepBack" asp-controller="Creation"> Назад</button>
         <button asp-action="Preview" asp-controller="Creation"> Далее</button>
     </form>
 }

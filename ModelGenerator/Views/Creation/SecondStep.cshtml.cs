@@ -4,34 +4,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ModelGenerator.DataBase.Models.Enums;
+using ModelGenerator.DataBase.Models;
 using ThreatsParser.Entities;
 
 namespace ModelGenerator.Views.Creation
 {
-    public class SecondStepModel : PageModel
+    public class FirstStepModel : PageModel
     {
+        private GlobalPreferences _preferences;
+        
         public GlobalPreferences Preferences { get; set; }
-        public List<SelectListItem> Risk { set; get; } = new List<SelectListItem>{
-            new SelectListItem { Value = "0", Text = "Маловероятно" },
-            new SelectListItem { Value = "2", Text = "Низкая" },
-            new SelectListItem { Value = "5", Text = "Средняя" },
-            new SelectListItem { Value = "10", Text = "Высокая" },
-        };
 
-        public List<RiskProbabilities> Risks { get; set; }
-        public List<int> Ids { get; set; }
+        public InitialSecurityLevel Level { get; set; }
 
-        public SecondStepModel(GlobalPreferences preferences)
+        public List<List<bool>> Flags { get; set; } = new List<List<bool>>();
+
+        public FirstStepModel(GlobalPreferences preferences)
         {
-            Preferences = preferences;
-            Risks = preferences.Items.Select(x => x.RiskProbabilities).ToList();
-            Ids = preferences.Items.Select(x => x.Id).ToList();
+            _preferences = Preferences = preferences;
+            Level = preferences.InitialSecurityLevel ?? new InitialSecurityLevel();
+            for (int i = 0; i < 7; i++)
+            {
+                var list = Enumerable.Repeat(false, 4).ToList();
+                Flags.Add(list);
+            }
+
+            Flags[0][(int)Level.PrivacyViolationDanger] = true;
+            Flags[1][(int)Level.AvailabilityViolationDanger] = true;
+            Flags[2][(int)Level.IntegrityViolationDanger] = true;
         }
 
         public void OnGet()
         {
+            Preferences = _preferences;
+        }
+
+        public void OnPost()
+        {
+            Preferences = _preferences;
         }
     }
 }

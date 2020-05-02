@@ -1,29 +1,51 @@
-﻿@model ModelGenerator.Views.Creation.SecondStepModel
-@{
-    <form method="post">
-        <div class="container" style="height: 800px; overflow: scroll">
-        <table class="table">
-            <tr>
-                <th>Номер</th>
-                <th>Название</th>
-                <th>Вероятность</th>
-            </tr>
-            @for (var i = 0; i < Model.Preferences.Items.Count(); i++)
-            {
-                <tr>
-                    <td>
-                        @Model.Preferences.Items[i].Id
-                    </td>
-                    <td>@Model.Preferences.Items[i].Name</td>
-                    <td>
-                        @Html.DropDownListFor(s => s.Risks[i], Model.Risk)
-                    </td>
-                </tr>
+﻿@model ModelGenerator.Views.Creation.FirstStepModel
 
-            }
-        </table>
+<form method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <label>Возможные источники угроз</label>
+                <br />
+                @foreach (var source in Model.Preferences.Source)
+                {
+                    <input name="Values" type="checkbox" value="@source.Item1" checked="@source.Item2" />
+                    @source.Item1
+                    <br />
+                }
+            </div>
+            <div class="col-6">
+                <label>Возможные объекты воздействия</label>
+                <div style="height: 600px; overflow: scroll">
+                    @foreach (var source in Model.Preferences.Targets)
+                    {
+                        <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2"/>
+                        @source.Item1
+                        <br/>
+                    }
+                </div>
+            </div>
         </div>
-        <button asp-action="FirstStepBack" asp-controller="Creation"> Назад</button>
-        <button asp-action="ThirdStep" asp-controller="Creation"> Далее</button>
-    </form>
-}
+        <div class="row">
+            <div class="col-4">
+                <label>Опасность нарушения конциденциальности</label><br /><br />
+                <input type="radio" value="Low" id="Pri" name="Pri" checked="@Model.Flags[0][0]"/>Низкий<br/>
+                <input type="radio" value="Medium" id="Pri" name="Pri" checked="@Model.Flags[0][1]"/>Средний<br/>
+                <input type="radio" value="High" id="Pri" name="Pri" checked="@Model.Flags[0][2]"/>Высокий<br/>
+            </div>
+            <div class="col-4">
+                <label>Опасность нарушения доступности</label><br /><br />
+                <input type="radio" value="Low" id="Ava" name="Ava" checked="@Model.Flags[1][0]"/>Низкий<br />
+                <input type="radio" value="Medium" id="Ava" name="Ava"  checked="@Model.Flags[1][1]"/>Средний<br />
+                <input type="radio" value="High" id="Ava" name="Ava"  checked="@Model.Flags[1][2]"/>Высокий<br />
+            </div>
+            <div class="col-4">
+                <label>Опасность нарушения целостности</label><br /><br />
+                <input type="radio" value="Low" id="Int" name="Int"  checked="@Model.Flags[2][0]"/>Низкий<br />
+                <input type="radio" value="Medium" id="Int" name="Int"  checked="@Model.Flags[2][1]"/>Средний<br />
+                <input type="radio" value="High" id="Int" name="Int" checked="@Model.Flags[2][2]" />Высокий<br />
+            </div>
+        </div>
+        <button asp-action="ForthStepBack" asp-controller="Creation"> Отмена</button>
+        <button asp-action="SecondStep" asp-controller="Creation"> Далее</button>
+    </div>
+</form>

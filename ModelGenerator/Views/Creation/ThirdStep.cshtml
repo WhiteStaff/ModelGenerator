@@ -1,31 +1,29 @@
-﻿@model ModelGenerator.Views.Creation.ThirdStepModel
+﻿@model ModelGenerator.Views.Creation.SecondStepModel
 @{
     <form method="post">
         <div class="container" style="height: 800px; overflow: scroll">
-            <table class="table" >
+        <table class="table">
+            <tr>
+                <th>Номер</th>
+                <th>Название</th>
+                <th>Вероятность</th>
+            </tr>
+            @for (var i = 0; i < Model.Preferences.Items.Count(); i++)
+            {
                 <tr>
-                    <th>Название</th>
-                    <th>Источник</th>
-                    <th>Свойства</th>
-                    <th>Опасность</th>
+                    <td>
+                        @Model.Preferences.Items[i].Id
+                    </td>
+                    <td>@Model.Preferences.Items[i].Name</td>
+                    <td>
+                        @Html.DropDownListFor(s => s.Risks[i], Model.Risk)
+                    </td>
                 </tr>
-                @for (var i = 0; i < Model.Preferences.Dangers.Count(); i++)
-                {
-                    <tr>
-                        <td>
-                            @Model.Preferences.Dangers[i].ThreatName
-                        </td>
-                        <td>@Model.Preferences.Dangers[i].Source</td>
-                        <td>@Model.Preferences.Dangers[i].Properties</td>
-                        <td>
-                            @Html.DropDownListFor(s => s.Dangers[i], Model.Danger)
-                        </td>
-                    </tr>
 
-                }
-            </table>
+            }
+        </table>
         </div>
-        <button asp-action="SecondStepBack" asp-controller="Creation"> Назад</button>
-        <button asp-action="ForthStep" asp-controller="Creation"> Далее</button>
+        <button asp-action="FirstStepBack" asp-controller="Creation"> Назад</button>
+        <button asp-action="ThirdStep" asp-controller="Creation"> Далее</button>
     </form>
 }
