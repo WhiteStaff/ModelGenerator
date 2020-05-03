@@ -24,7 +24,9 @@ namespace ML
             var data = mlContext.Data.LoadFromEnumerable(inMemoryCollection);
 
             EstimatorChain<RegressionPredictionTransformer<LinearRegressionModelParameters>> pipelineEstimator =
-                mlContext.Transforms.Concatenate("Features", new string[] { "TerritorialLocation",
+                mlContext.Transforms.Concatenate("Features", new string[]
+                    {
+                        "TerritorialLocation",
                         "NetworkCharacteristic",
                         "PersonalDataActionCharacteristics",
                         "PersonalDataPermissionSplit",
@@ -36,15 +38,16 @@ namespace ML
                         "Availability",
                         "Integrity",
                         "Targets",
-                        "ThreatName",
-                        "Source" })
+                        "ThreatName"
+                    })
                     .Append(mlContext.Transforms.NormalizeMinMax("Features"))
                     .Append(mlContext.Regression.Trainers.Sdca());
             ITransformer trainedModel = pipelineEstimator.Fit(data);
-            var projectPath = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()))));
+            var projectPath =
+                Path.GetDirectoryName(
+                    Path.GetDirectoryName(
+                        Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()))));
             mlContext.Model.Save(trainedModel, data.Schema, $"{projectPath}\\model.zip");
-
-
         }
 
         private static List<PossibilityMLModel> GetData(ThreatsDbContext context)
@@ -62,7 +65,7 @@ namespace ML
                     .Include(x => x.ModelPreferencesTarget)
                     .ThenInclude(x => x.Target)
                     .FirstOrDefault(x => x.Id == model.Preferences.Id);
-                
+
                 var line = new PossibilityMLModel();
                 line.TerritorialLocation = (int) prefs.LocationCharacteristic;
                 line.NetworkCharacteristic = (int) prefs.NetworkCharacteristic;
@@ -81,31 +84,26 @@ namespace ML
                     .Select(x => sources.Contains(x.Name) ? 1.0f : 0.0f)
                     .ToArray();
 
-                var targets = notFull.ModelPreferencesTarget.Select(x => x.Target.Name).ToList().OrderBy(x => x).ToList();
+                var targets = notFull.ModelPreferencesTarget.Select(x => x.Target.Name).ToList().OrderBy(x => x)
+                    .ToList();
                 line.Targets =
                     context.Target
                         .ToList()
                         .Select(x => targets.Contains(x.Name) ? 1f : 0f)
                         .ToArray();
 
-
-                for (var index = 0; index < prefs.ThreatDangers.Count; index++)
+                for (var index = 0; index < prefs.ThreatPossibilities.Count; index++)
                 {
                     var uniq = line;
-                    var curr = prefs.ThreatDangers.ElementAt(index);
+                    var curr = prefs.ThreatPossibilities.ElementAt(index);
                     uniq.ThreatName = context.Threat
                         .Select(x => x.Name)
                         .ToList()
                         .OrderBy(x => x)
                         .Select((x, i) => (x, i))
-                        .FirstOrDefault(x => x.x ==curr.Threat.Name).i;
-                    uniq.Source = context.Source
-                        .Select(x => x.Name)
-                        .ToList()
-                        .OrderBy(x => x)
-                        .Select((x, i) => (x, i))
-                        .FirstOrDefault(x => x.x == curr.Source.Name).i;
-                    uniq.Danger = (int)curr.DangerLevel;
+                        .FirstOrDefault(x => x.x == curr.Threat.Name).i;
+
+                    uniq.Risk = (int) curr.RiskProbability;
                     result.Add(uniq);
                 }
             }

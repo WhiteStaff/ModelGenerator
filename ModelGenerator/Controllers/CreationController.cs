@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.ML;
+using ML;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models.Enums;
+using ModelGenerator.Models.Core.Entities;
 using ModelGenerator.Views.Creation;
 using Newtonsoft.Json;
 using ThreatsParser.Entities;
 using ThreatsParser.FileActions;
 using TreatsParser.Core;
+using TreatsParser.Core.Helpers;
 
 namespace ModelGenerator.Controllers
 {
@@ -125,6 +130,34 @@ namespace ModelGenerator.Controllers
                 {
                     line.DangerLevel = Int;
                 }
+            }
+
+            var projectPath = Path.GetDirectoryName(Directory.GetCurrentDirectory());
+            MLContext mlContext = new MLContext();
+            ITransformer trainedModel = mlContext.Model.Load($"{projectPath}\\model.zip", out var modelSchema);
+            
+
+            foreach (var preferencesItem in Preferences.Items)
+            {
+                var modelPart = Resolver.GetMlModel(Preferences);
+                modelPart.ThreatName = Preferences.AllItems
+                    .OrderBy(x => x.Name)
+                    .Select((x, i) => (x, i))
+                    .FirstOrDefault(x => x.x.Name == preferencesItem.Name).i;
+
+                var predictionEngine = mlContext.Model.CreatePredictionEngine<PossibilityMLModel, RiskPrediction>(trainedModel);
+                var prediction = predictionEngine.Predict(modelPart);
+
+                RiskProbabilities risk;
+                if (prediction.Risk < 0) risk = RiskProbabilities.Unlikely;
+                else
+                if (prediction.Risk >= 4) risk = RiskProbabilities.High;
+                else
+                {
+                    risk = (RiskProbabilities) ((int) Math.Round(Convert.ToDouble(prediction.Risk)));
+                }
+
+                preferencesItem.RiskProbabilities = risk;
             }
 
             json = JsonConvert.SerializeObject(Preferences);

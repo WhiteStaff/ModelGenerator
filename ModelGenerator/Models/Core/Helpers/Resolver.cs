@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using ML;
 using ModelGenerator.DataBase.Models.Enums;
+using ThreatsParser.Entities;
 
 namespace TreatsParser.Core.Helpers
 {
@@ -106,6 +109,33 @@ namespace TreatsParser.Core.Helpers
             }
             // Return char and concat substring.
             return char.ToUpper(s[0]) + s.Substring(1);
+        }
+
+        public static PossibilityMLModel GetMlModel(GlobalPreferences preferences)
+        {
+            var result = new PossibilityMLModel();
+            result.TerritorialLocation = (int)preferences.InitialSecurityLevel.TerritorialLocation;
+            result.NetworkCharacteristic = (int)preferences.InitialSecurityLevel.NetworkCharacteristic;
+            result.PersonalDataActionCharacteristics = (int)preferences.InitialSecurityLevel.PersonalDataActionCharacteristics;
+            result.PersonalDataPermissionSplit = (int)preferences.InitialSecurityLevel.PersonalDataPermissionSplit;
+            result.OtherDbConnections = (int)preferences.InitialSecurityLevel.OtherDbConnections;
+            result.AnonymityLevel = (int)preferences.InitialSecurityLevel.AnonymityLevel;
+            result.PersonalDataSharingLevel = (int)preferences.InitialSecurityLevel.PersonalDataSharingLevel;
+            result.Privacy = (int)preferences.InitialSecurityLevel.PrivacyViolationDanger;
+            result.Availability = (int)preferences.InitialSecurityLevel.AvailabilityViolationDanger;
+            result.Integrity = (int)preferences.InitialSecurityLevel.IntegrityViolationDanger;
+
+            result.Sources = preferences.Source
+                .OrderBy(x => x.Item1)
+                .Select(x => x.Item2 ? 1f : 0f)
+                .ToArray();
+
+            result.Targets = preferences.Targets
+                .OrderBy(x => x.Item1)
+                .Select(x => x.Item2 ? 1f : 0f)
+                .ToArray();
+
+            return result;
         }
 
         public static RiskProbabilities ResolvePossibility(this string s)
