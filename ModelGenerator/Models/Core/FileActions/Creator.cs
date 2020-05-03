@@ -41,7 +41,7 @@ namespace ThreatsParser.FileActions
         {
             var data = GetParsedData();
 
-            foreach (var threatModel in data.Items)
+            foreach (var threatModel in data.AllItems)
             {
                 var model = threatModel.ToDbModel();
 
@@ -201,6 +201,8 @@ namespace ThreatsParser.FileActions
 
                 var targets = context.Target.Select(x => x.Name).ToList();
                 globalPreferences.Targets = targets
+                    .ToList()
+                    .OrderBy(x => x)
                     .Select(x => (x, true))
                     .ToList();
 
@@ -246,11 +248,18 @@ namespace ThreatsParser.FileActions
                     .FirstOrDefault(x => x.Id == preferences.Id);
 
                 var sources = full.ModelPreferencesSource.Select(x => x.Source.Name);
-                globalPreferences.Source = context.Source.ToList().Select(x => (x.Name, sources.Contains(x.Name))).ToList();
+                globalPreferences.Source = context.Source
+                    .ToList()
+                    .Select(x => (x.Name, sources.Contains(x.Name)))
+                    .ToList();
 
                 var targets = notFull.ModelPreferencesTarget.Select(x => x.Target.Name);
                 globalPreferences.Targets =
-                    context.Target.ToList().Select(x => (x.Name, targets.Contains(x.Name))).ToList();
+                    context.Target
+                        .ToList()
+                        .OrderBy(x => x.Name)
+                        .Select(x => (x.Name, targets.Contains(x.Name)))
+                        .ToList();
 
                 globalPreferences.AllItems
                     .ForEach(currentThreat => currentThreat.Source

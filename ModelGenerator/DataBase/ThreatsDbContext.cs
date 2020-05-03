@@ -11,6 +11,12 @@ namespace ModelGenerator.DataBase
 
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var conn = "Server=.\\SQLEXPRESS;Database=ThreatDb;Trusted_Connection=True;";
+            optionsBuilder.UseSqlServer(conn);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ThreatSource>()
