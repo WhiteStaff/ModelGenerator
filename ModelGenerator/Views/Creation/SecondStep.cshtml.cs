@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ModelGenerator.DataBase.Models;
-using ThreatsParser.Entities;
+using ModelGenerator.Models.Core.Entities;
 
 namespace ModelGenerator.Views.Creation
 {

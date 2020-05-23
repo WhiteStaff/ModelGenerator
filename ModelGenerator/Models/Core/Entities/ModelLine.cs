@@ -1,5 +1,5 @@
 ﻿
-namespace ThreatsParser.Entities
+namespace ModelGenerator.Models.Core.Entities
 {
     public class ModelLine
     {

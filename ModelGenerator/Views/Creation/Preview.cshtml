@@ -26,9 +26,16 @@
                 }
             </table>
         </div>
-        <input name="Name"/>
-        <button asp-action="ForthStepBack" asp-controller="Creation"> Назад</button>
-        <button asp-action="Download" asp-controller="Creation"> Скачать</button>
-        <button asp-action="SaveModel" asp-controller="Creation"> Сохранить</button>
+        <div class="row mt-2">
+            <div class="col-6">
+                <button class="btn  btn-secondary" asp-action="Cancel" asp-controller="Creation"> Отмена</button>
+                <button class="btn  btn-secondary" asp-action="ThirdStepBack" asp-controller="Creation"> Назад</button>
+            </div>
+            <div class="col-6">
+                <input name="Name" required placeholder="Название файла" class="form-control"/> <br/>
+                <button class="btn  btn-secondary mt-1" asp-action="Download" asp-controller="Creation"> Скачать</button>
+                <button class="btn  btn-secondary mt-1" asp-action="SaveModel" asp-controller="Creation"> Сохранить</button>
+            </div>
+        </div>
     </form>
 }

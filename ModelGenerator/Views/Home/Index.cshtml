@@ -1,7 +1,8 @@
-﻿@model ModelGenerator.Views.Home.IndexModel
+﻿@using Microsoft.AspNetCore.Http
+@model ModelGenerator.Views.Home.IndexModel
 
 @{
-    ViewData["Title"] = "Courses";
+    ViewData["Title"] = "Модели угроз";
 }
 
     <h1>Созданные модели</h1>
@@ -25,13 +26,13 @@
                         @Html.DisplayFor(modelItem => item.CreationTime)
                     </td>
                     <td>
-                        @Html.ActionLink("Изменить", actionName: "PreviewExist", controllerName: "Creation", new{Id = item.Id})|
-                        @Html.ActionLink("Удалить", actionName: "DeleteExist", controllerName: "Creation", new { Id = item.Id })|
+                        @Html.ActionLink("Изменить", actionName: "PreviewExist", controllerName: "Creation", new{Id = item.Id}) |
+                        @Html.ActionLink("Удалить", actionName: "DeleteExist", controllerName: "Creation", new { Id = item.Id }) |
                         @Html.ActionLink("Скачать", actionName: "DownloadExist", controllerName: "Creation", new { Id = item.Id })
                     </td>
                 </tr>
             }
             </tbody>
         </table>
-        <input type="submit" asp-action="Start" asp-controller="Creation" value="Новая модель"/>
+        <input type="submit" class="btn  btn-secondary" asp-action="Start" asp-controller="Creation" value="Новая модель"/>
     </form>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.ML.Data;
 
-namespace ML
+namespace ModelGenerator.Models.Core.Entities
 {
     public class PossibilityMLModel
     {

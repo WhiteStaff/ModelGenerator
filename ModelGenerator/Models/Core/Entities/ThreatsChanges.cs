@@ -1,4 +1,4 @@
-﻿namespace ThreatsParser.Entities
+﻿namespace ModelGenerator.Models.Core.Entities
 {
     class ThreatsChanges
     {

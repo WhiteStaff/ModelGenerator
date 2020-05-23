@@ -2,7 +2,7 @@
 @{
     <form method="post">
         <div class="container" style="height: 800px; overflow: scroll">
-            <table class="table" >
+            <table class="table">
                 <tr>
                     <th>Название</th>
                     <th>Источник</th>
@@ -25,7 +25,8 @@
                 }
             </table>
         </div>
-        <button asp-action="SecondStepBack" asp-controller="Creation"> Назад</button>
-        <button asp-action="Preview" asp-controller="Creation"> Далее</button>
+        <button class="btn  btn-secondary" asp-action="Cancel" asp-controller="Creation"> Отмена</button>
+        <button class="btn  btn-secondary" asp-action="SecondStepBack" asp-controller="Creation"> Назад</button>
+        <button class="btn  btn-secondary" asp-action="Preview" asp-controller="Creation"> Далее</button>
     </form>
 }

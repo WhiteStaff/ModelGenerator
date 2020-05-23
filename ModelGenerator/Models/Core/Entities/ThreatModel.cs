@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ModelGenerator.DataBase.Models;
 using ModelGenerator.DataBase.Models.Enums;
-using TreatsParser.Core.Helpers;
+using ModelGenerator.Models.Core.Helpers;
 
-namespace ThreatsParser.Entities
+namespace ModelGenerator.Models.Core.Entities
 {
     public class ThreatModel
     {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ThreatsParser.Entities;
-using TreatsParser.Core.Helpers;
+using ModelGenerator.Models.Core.Entities;
+using ModelGenerator.Models.Core.Helpers;
 
-namespace TreatsParser.Core
+namespace ModelGenerator.Models.Core
 {
     public static class ModelGeneration
     {

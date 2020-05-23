@@ -1,7 +1,6 @@
 ﻿using ModelGenerator.DataBase.Models.Enums;
 
-
-namespace ThreatsParser.Entities
+namespace ModelGenerator.Models.Core.Entities
 {
     public class DangerousLevelLine
     {

@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models;
+using ModelGenerator.Models.Core.Entities;
+using ModelGenerator.Models.Core.Exceptions;
+using ModelGenerator.Models.Core.Helpers;
 using OfficeOpenXml;
-using ThreatsParser.Entities;
-using ThreatsParser.Exceptions;
-using TreatsParser.Core;
-using TreatsParser.Core.Helpers;
-using ModelLine = ThreatsParser.Entities.ModelLine;
+using ModelLine = ModelGenerator.Models.Core.Entities.ModelLine;
 using DbModelLine = ModelGenerator.DataBase.Models.ModelLine;
 
 
-namespace ThreatsParser.FileActions
+namespace ModelGenerator.Models.Core.FileActions
 {
     static class Creator
     {

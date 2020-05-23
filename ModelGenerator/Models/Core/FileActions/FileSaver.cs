@@ -1,20 +1,14 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using ThreatsParser.Entities;
+using ModelGenerator.Models.Core.Entities;
 
-namespace ThreatsParser.FileActions
+namespace ModelGenerator.Models.Core.FileActions
 {
     static class FileSaver
     {
-        public static void Save(List<ModelLine> model)
-        {
-            //TODO logic to save
-        }
-
         public static byte[] SaveModel(List<ModelLine> model)
         {
             byte[] result;

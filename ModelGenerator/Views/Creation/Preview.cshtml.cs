@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ThreatsParser.Entities;
-using TreatsParser.Core;
+using ModelGenerator.Models.Core;
+using ModelGenerator.Models.Core.Entities;
 
 namespace ModelGenerator.Views.Creation
 {

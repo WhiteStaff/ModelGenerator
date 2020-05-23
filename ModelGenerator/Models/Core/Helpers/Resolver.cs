@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using ML;
 using ModelGenerator.DataBase.Models.Enums;
-using ThreatsParser.Entities;
+using ModelGenerator.Models.Core.Entities;
 
-namespace TreatsParser.Core.Helpers
+namespace ModelGenerator.Models.Core.Helpers
 {
     public static class Resolver
     {

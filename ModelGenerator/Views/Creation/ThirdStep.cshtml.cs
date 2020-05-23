@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModelGenerator.DataBase.Models.Enums;
-using ThreatsParser.Entities;
+using ModelGenerator.Models.Core.Entities;
 
 namespace ModelGenerator.Views.Creation
 {

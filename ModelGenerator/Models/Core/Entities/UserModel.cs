@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace ThreatsParser.Entities
+﻿namespace ModelGenerator.Models.Core.Entities
 {
     public class UserModel
     {

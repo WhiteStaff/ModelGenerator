@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ThreatsParser.Entities
+namespace ModelGenerator.Models.Core.Entities
 {
     public class GlobalPreferences
     {

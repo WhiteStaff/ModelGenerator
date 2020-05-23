@@ -18,9 +18,9 @@
                 <div style="height: 600px; overflow: scroll">
                     @foreach (var source in Model.Preferences.Targets)
                     {
-                        <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2"/>
+                        <input name="targets" type="checkbox" value="@source.Item1" checked="@source.Item2" />
                         @source.Item1
-                        <br/>
+                        <br />
                     }
                 </div>
             </div>
@@ -28,24 +28,25 @@
         <div class="row">
             <div class="col-4">
                 <label>Опасность нарушения конциденциальности</label><br /><br />
-                <input type="radio" value="Low" id="Pri" name="Pri" checked="@Model.Flags[0][0]"/>Низкий<br/>
-                <input type="radio" value="Medium" id="Pri" name="Pri" checked="@Model.Flags[0][1]"/>Средний<br/>
-                <input type="radio" value="High" id="Pri" name="Pri" checked="@Model.Flags[0][2]"/>Высокий<br/>
+                <input type="radio" value="Low" id="Pri" name="Pri" checked="@Model.Flags[0][0]" />Низкий<br />
+                <input type="radio" value="Medium" id="Pri" name="Pri" checked="@Model.Flags[0][1]" />Средний<br />
+                <input type="radio" value="High" id="Pri" name="Pri" checked="@Model.Flags[0][2]" />Высокий<br />
             </div>
             <div class="col-4">
                 <label>Опасность нарушения доступности</label><br /><br />
-                <input type="radio" value="Low" id="Ava" name="Ava" checked="@Model.Flags[1][0]"/>Низкий<br />
-                <input type="radio" value="Medium" id="Ava" name="Ava"  checked="@Model.Flags[1][1]"/>Средний<br />
-                <input type="radio" value="High" id="Ava" name="Ava"  checked="@Model.Flags[1][2]"/>Высокий<br />
+                <input type="radio" value="Low" id="Ava" name="Ava" checked="@Model.Flags[1][0]" />Низкий<br />
+                <input type="radio" value="Medium" id="Ava" name="Ava" checked="@Model.Flags[1][1]" />Средний<br />
+                <input type="radio" value="High" id="Ava" name="Ava" checked="@Model.Flags[1][2]" />Высокий<br />
             </div>
             <div class="col-4">
                 <label>Опасность нарушения целостности</label><br /><br />
-                <input type="radio" value="Low" id="Int" name="Int"  checked="@Model.Flags[2][0]"/>Низкий<br />
-                <input type="radio" value="Medium" id="Int" name="Int"  checked="@Model.Flags[2][1]"/>Средний<br />
+                <input type="radio" value="Low" id="Int" name="Int" checked="@Model.Flags[2][0]" />Низкий<br />
+                <input type="radio" value="Medium" id="Int" name="Int" checked="@Model.Flags[2][1]" />Средний<br />
                 <input type="radio" value="High" id="Int" name="Int" checked="@Model.Flags[2][2]" />Высокий<br />
             </div>
         </div>
-        <button asp-action="ForthStepBack" asp-controller="Creation"> Отмена</button>
-        <button asp-action="SecondStep" asp-controller="Creation"> Далее</button>
+        <button class="btn  btn-secondary" asp-action="Cancel" asp-controller="Creation"> Отмена</button>
+        <button class="btn  btn-secondary" asp-action="ForthStepBack" asp-controller="Creation"> Назад</button>
+        <button class="btn  btn-secondary" asp-action="SecondStep" asp-controller="Creation"> Далее</button>
     </div>
 </form>

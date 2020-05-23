@@ -1,8 +1,8 @@
 ﻿using System;
 using ModelGenerator.DataBase.Models;
-using ThreatsParser.Entities;
+using ModelGenerator.Models.Core.Entities;
 
-namespace TreatsParser.Core
+namespace ModelGenerator.Models.Core
 {
     public static class Extensions
     {

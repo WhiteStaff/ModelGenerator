@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ThreatsParser.Exceptions
+namespace ModelGenerator.Models.Core.Exceptions
 {
     class NoFileException : Exception
     {

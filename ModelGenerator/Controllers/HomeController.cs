@@ -15,9 +15,8 @@ using Microsoft.Extensions.Logging;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models;
 using ModelGenerator.Models;
+using ModelGenerator.Models.Core.FileActions;
 using ModelGenerator.Views.Home;
-using ThreatsParser.Entities;
-using ThreatsParser.FileActions;
 
 namespace ModelGenerator.Controllers
 {
@@ -37,7 +36,7 @@ namespace ModelGenerator.Controllers
         public IActionResult Index()
         {
             var models = _context.User.Include(x => x.Model).FirstOrDefault(x => x.Login == User.Identity.Name)?.Model.ToList() ?? new List<Model>();
-            //Creator.SetParsedData(_context);
+            if (!_context.Threat.Any()) Creator.SetParsedData(_context);
             //var models = new List<Model>();
             return View("Index", new IndexModel(models));
         }
