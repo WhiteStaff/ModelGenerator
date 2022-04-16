@@ -16,5 +16,7 @@ namespace ModelGenerator.DataBase.Models
         public ICollection<ModelLine> Lines { get; set; }
 
         public ModelPreferences Preferences { get; set; }
+
+        public SecurityTestResult SecurityTestResult { get; set; }
     }
 }

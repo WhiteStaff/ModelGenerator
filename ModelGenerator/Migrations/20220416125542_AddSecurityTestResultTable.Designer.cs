@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModelGenerator.DataBase;
 
 namespace ModelGenerator.Migrations
 {
     [DbContext(typeof(ThreatsDbContext))]
-    partial class ThreatsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220416125542_AddSecurityTestResultTable")]
+    partial class AddSecurityTestResultTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,7 +184,7 @@ namespace ModelGenerator.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SecurityTestResults");
+                    b.ToTable("SecurityTestResult");
                 });
 
             modelBuilder.Entity("ModelGenerator.DataBase.Models.Source", b =>

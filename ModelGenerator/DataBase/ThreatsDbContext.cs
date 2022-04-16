@@ -13,7 +13,7 @@ namespace ModelGenerator.DataBase
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var conn = "Server=.\\SQLEXPRESS;Database=ThreatDb;Trusted_Connection=True;";
+            var conn = "Server=(localdb)\\MSSQLLocalDB;Database=ThreatDb;Trusted_Connection=True;";
             optionsBuilder.UseSqlServer(conn);
         }
 
@@ -91,6 +91,8 @@ namespace ModelGenerator.DataBase
         public DbSet<ThreatPossibility> ThreatPossibility { get; set; }
 
         public DbSet<User> User { get; set; }
+
+        public DbSet<SecurityTestResult> SecurityTestResults { get; set; }
 
     }
 }
