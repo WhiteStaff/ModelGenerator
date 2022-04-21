@@ -35,7 +35,10 @@ namespace ModelGenerator.Controllers
         
         public IActionResult Index()
         {
-            var models = _context.User.Include(x => x.Model).FirstOrDefault(x => x.Login == User.Identity.Name)?.Model.ToList() ?? new List<Model>();
+            var models = _context.User
+                .Include(x => x.Model)
+                .ThenInclude(x => x.SecurityTestResult)
+                .FirstOrDefault(x => x.Login == User.Identity.Name)?.Model.ToList() ?? new List<Model>();
             if (!_context.Threat.Any()) Creator.SetParsedData(_context);
             //var models = new List<Model>();
             return View("Index", new IndexModel(models));

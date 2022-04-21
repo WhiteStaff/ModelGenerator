@@ -41,5 +41,7 @@ namespace ModelGenerator.DataBase.Models
         public DangerLevel DangerLevel { get; set; }
         
         public bool IsActual { get; set; }
+
+        public ICollection<ModelLineVulnerability> Vulnerabilities { get; set; }
     }
 }

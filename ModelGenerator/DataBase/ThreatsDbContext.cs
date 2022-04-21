@@ -94,5 +94,7 @@ namespace ModelGenerator.DataBase
 
         public DbSet<SecurityTestResult> SecurityTestResults { get; set; }
 
+        public DbSet<ModelLineVulnerability> ModelLineVulnerability { get; set; }
+
     }
 }

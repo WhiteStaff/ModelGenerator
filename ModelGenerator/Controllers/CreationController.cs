@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
 using ModelGenerator.DataBase;
 using ModelGenerator.DataBase.Models.Enums;
@@ -217,6 +218,20 @@ namespace ModelGenerator.Controllers
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 $"{Name}.docx");
+        }
+
+        public IActionResult DownloadXSpider(Guid id)
+        {
+            var model = _context.ModelLine
+                .Where(x => x.ModelId == id && x.IsActual)
+                .Include(x => x.Vulnerabilities)
+                .Include(x => x.Threat)
+                .ToList();
+            var bytes = FileSaver.SaveXSpiderReport(model);
+            var Name = _context.Model.FirstOrDefault(x => x.Id == id).Name;
+            return File(bytes,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                $"{Name}-XSpider.docx");
         }
     }
 }

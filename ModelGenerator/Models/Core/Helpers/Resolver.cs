@@ -152,5 +152,22 @@ namespace ModelGenerator.Models.Core.Helpers
                     return RiskProbabilities.Unlikely;
             }
         }
+
+        public static FoundVulnerabilityLevel ResolveVulnerabilityLevel(string level)
+        {
+            switch (level)
+            {
+                case "высокая (подозрение)":
+                    return FoundVulnerabilityLevel.MaybeHigh;
+                case "высокая":
+                    return FoundVulnerabilityLevel.High;
+                case "средняя (подозрение)":
+                    return FoundVulnerabilityLevel.MaybeMedium;
+                case "средняя":
+                    return FoundVulnerabilityLevel.Medium;
+                default:
+                    return FoundVulnerabilityLevel.Low;
+            }
+        }
     }
 }
